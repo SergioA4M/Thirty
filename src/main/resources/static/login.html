@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Thirty - Iniciar Sesión</title>
+    <style>
+        body {
+            background-color: #e9eff4;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-card {
+            background: white;
+            padding: 40px;
+            border: 1px solid #bdc3c7;
+            width: 320px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 { color: #3b5998; margin-bottom: 25px; font-size: 32px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        button {
+            background: linear-gradient(to bottom, #4c66a4 0%, #3b5998 100%);
+            color: white;
+            border: 1px solid #2d4373;
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+        button:hover { opacity: 0.9; }
+        #error { color: #cc0000; font-size: 13px; margin-top: 10px; min-height: 18px; }
+    </style>
+</head>
+<body>
+<div class="login-card">
+    <h2>thirty</h2>
+    <input type="email" id="email" placeholder="Correo electrónico">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button onclick="login()">Entrar</button>
+    <p id="error"></p>
+</div>
+
+<script>
+    // Si ya estás logueado, te manda directo al home sin preguntar
+    window.onload = () => {
+        if (localStorage.getItem('usuarioNombre')) {
+            window.location.href = "home.html";
+        }
+    };
+
+    async function login() {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+        const errorDiv = document.getElementById('error');
+
+        if (!email || !pass) {
+            errorDiv.innerText = "Por favor, rellena todos los campos";
+            return;
+        }
+
+        try {
+            // Buscamos en tu API de usuarios
+            const response = await fetch('/api/users');
+            const usuarios = await response.json();
+
+            // Buscamos si existe el usuario con ese email y pass
+            const encontrado = usuarios.find(u => u.email === email && u.passwordHash === pass);
+
+            if (encontrado) {
+                // Guardamos su nombre para el muro
+                localStorage.setItem('usuarioNombre', encontrado.firstName);
+                window.location.href = "home.html";
+            } else {
+                errorDiv.innerText = "Usuario o contraseña incorrectos";
+            }
+        } catch (e) {
+            errorDiv.innerText = "Error de conexión con el servidor";
+        }
+    }
+</script>
+</body>
+</html>

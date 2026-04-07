@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Thirty - Inicio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { background-color: #e9eff4; font-family: 'Segoe UI', sans-serif; margin: 0; }
+        header { background-color: #3b5998; color: white; padding: 10px 15%; display: flex; align-items: center; justify-content: space-between; }
+
+        .main-grid { display: grid; grid-template-columns: 200px 1fr 250px; gap: 20px; padding: 20px 15%; }
+
+        .card { background: white; padding: 15px; border: 1px solid #bdc3c7; margin-bottom: 15px; border-radius: 2px; }
+        h5 { margin-top:0; border-bottom: 1px solid #eee; padding-bottom: 5px; color: #3b5998; }
+
+        /* Estilo Redes Sociales */
+        .social-links { list-style: none; padding: 0; }
+        .social-links li { margin-bottom: 12px; display: flex; align-items: center; font-size: 14px; }
+        .social-links i { margin-right: 10px; width: 20px; text-align: center; font-size: 18px; }
+        .fa-instagram { color: #E1306C; }
+        .fa-linkedin { color: #0077b5; }
+        .fa-x-twitter { color: #000; }
+        .fa-facebook { color: #1877F2; }
+        .fa-tiktok { color: #000; }
+
+        /* Cumpleaños */
+        .cumple-item { display: flex; align-items: center; font-size: 13px; margin-top: 10px; }
+        .cumple-icon { color: #f39c12; margin-right: 8px; }
+
+        /* Muro Central */
+        .center-col .status-box { background: white; padding: 15px; border: 1px solid #bdc3c7; margin-bottom: 20px; }
+        .status-box textarea { width: 100%; border: 1px solid #ccc; padding: 10px; box-sizing: border-box; resize: none; border-radius: 4px; }
+
+        .feed-title { font-weight: bold; color: #666; margin-bottom: 10px; display: block; border-bottom: 1px solid #ccc; }
+        .post { background: white; padding: 15px; border: 1px solid #bdc3c7; margin-bottom: 15px; display: flex; gap: 10px; }
+        .post img { width: 50px; height: 50px; border-radius: 4px; }
+        .post-content { flex: 1; }
+        .post-header { font-weight: bold; color: #3b5998; margin-bottom: 5px; }
+        .post-time { font-size: 11px; color: #999; }
+        header {
+            background: linear-gradient(to bottom, #4c66a4 0%, #3b5998 100%);
+            border-bottom: 1px solid #2d4373;
+            color: white;
+            padding: 0 15%; /* Centrado estilo Tuenti */
+            height: 42px;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .nav-item {
+            padding: 0 12px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            text-decoration: none;
+            color: white;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .nav-active {
+            background-color: #2d4373; /* El azul más oscuro para el item seleccionado */
+        }
+
+        .search-bar {
+            background: white;
+            border: none;
+            padding: 3px 10px;
+            margin-left: 15px;
+            width: 150px;
+            height: 20px;
+            font-size: 11px;
+            border-radius: 2px;
+        }
+
+        .btn-subir {
+            background: linear-gradient(to bottom, #5b74a8 0%, #2d4373 100%);
+            border: 1px solid #1d2a4a;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 3px;
+            margin-left: 10px;
+            font-size: 11px;
+            cursor: pointer;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-size: 20px; margin-right: 20px;">thirty</div>
+
+    <a href="home.html" class="nav-item nav-active">Inicio</a>
+    <a href="#" class="nav-item">Perfil</a>
+    <a href="#" class="nav-item">Mensajes</a>
+    <a href="#" class="nav-item">Gente</a>
+    <a href="#" class="nav-item">Vídeos</a>
+
+    <input type="text" class="search-bar" placeholder="Buscar...">
+
+    <button class="btn-subir">Subir fotos ⬆</button>
+
+    <div class="header-right">
+        <a href="#" style="color:white; text-decoration:none;">Mi cuenta</a>
+        <a href="login.html" onclick="localStorage.clear()" style="color:white; text-decoration:none;">Salir</a>
+    </div>
+</header>
+
+<div class="main-grid">
+    <div class="left-col">
+        <div class="card">
+            <img src="https://via.placeholder.com/150" style="width: 100%; margin-bottom:10px;" alt="Foto Perfil">
+            <h4 id="userName" style="margin:0; text-align:center;">Usuario</h4>
+        </div>
+
+        <div class="card">
+            <h5>Mis Redes</h5>
+            <ul class="social-links">
+                <li><i class="fab fa-instagram"></i> Instagram</li>
+                <li><i class="fab fa-linkedin"></i> LinkedIn</li>
+
+                <li><i class="fa-brands fa-x-twitter"></i> X (Twitter)</li>
+
+                <li><i class="fab fa-tiktok"></i> TikTok</li>
+                <li><i class="fab fa-facebook"></i> Facebook</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h5>Próximos Cumpleaños</h5>
+            <div class="cumple-item">
+                <i class="fas fa-cake-candles cumple-icon"></i>
+                <span><strong>Hoy:</strong> Sergio Thirty</span>
+            </div>
+            <div class="cumple-item">
+                <i class="fas fa-cake-candles cumple-icon" style="opacity: 0.5;"></i>
+                <span>Mañana: María López</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="center-col">
+        <div class="status-box">
+            <textarea id="textoPost" placeholder="¿Qué hay de nuevo, treintañero?" rows="2"></textarea>
+            <button onclick="publicarMensaje()" style="float:right; margin-top:5px; background:#3b5998; color:white; border:none; padding:6px 20px; cursor:pointer; font-weight:bold;">Publicar</button>
+            <div style="clear:both;"></div>
+        </div>
+
+        <span class="feed-title">Novedades de tus amistades</span>
+
+        <div id="muro">
+        </div>
+    </div>
+
+    <div class="right-col">
+        <div class="card" style="padding:0; height: 450px; display: flex; flex-direction: column;">
+            <div style="background: #f6f7f9; padding: 10px; border-bottom: 1px solid #bdc3c7; font-weight: bold; font-size: 13px;">
+                Chat (2)
+            </div>
+            <div style="flex:1; padding:10px; font-size:12px; color: #444;">
+                <div style="margin-bottom:8px;">● Sergio Thirty</div>
+                <div style="margin-bottom:8px;">● Dani DAM</div>
+                <div style="color:#999; margin-top:20px;">○ María López (Desconectado)</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const nombre = localStorage.getItem('usuarioNombre');
+        if (nombre) {
+            document.getElementById('userName').innerText = nombre;
+        }
+    });
+    // 1. Función para publicar un mensaje
+    async function publicarMensaje() {
+        const elementoTexto = document.getElementById('textoPost');
+        const texto = elementoTexto.value.trim(); // .trim() quita espacios vacíos
+        const nombre = localStorage.getItem('usuarioNombre') || "Anónimo";
+
+        if (!texto) {
+            alert("¡Escribe algo antes de publicar!");
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:8080/api/posts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    author: nombre,
+                    content: texto
+                })
+            });
+
+            if (response.ok) {
+                elementoTexto.value = ""; // Limpiar el cuadro después de enviar
+                await cargarPosts();      // Forzar la recarga del muro
+            } else {
+                alert("Error al guardar en la base de datos");
+            }
+        } catch (error) {
+            console.error("Error de conexión:", error);
+            alert("No se pudo conectar con el servidor. ¿Está encendido el Play verde?");
+        }
+    }
+
+    // 2. Función para cargar los posts de la DB y pintarlos en el muro
+    async function cargarPosts() {
+        const response = await fetch('http://localhost:8080/api/posts');
+        const posts = await response.json();
+
+        const muro = document.getElementById('muro');
+        muro.innerHTML = ""; // Limpiar posts antiguos
+
+        posts.forEach(post => {
+            const fecha = new Date(post.createdAt).toLocaleTimeString();
+            muro.innerHTML += `
+                <div class="post">
+                    <img src="https://ui-avatars.com/api/?name=${post.author}&background=3b5998&color=fff" alt="Avatar">
+                    <div class="post-content">
+                        <div class="post-header">${post.author}</div>
+                        <div>${post.content}</div>
+                        <div class="post-time">Publicado a las ${fecha}</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // Llamar a cargarPosts al entrar en la página
+    document.addEventListener('DOMContentLoaded', cargarPosts);
+</script>
+
+</body>
+</html>

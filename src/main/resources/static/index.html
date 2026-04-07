@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Thirty - Registro</title>
+    <style>
+        body { background-color: #e9eff4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; }
+        header { background-color: #3b5998; color: white; padding: 15px 50px; font-size: 28px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .container { display: flex; justify-content: center; margin-top: 50px; }
+        .card { background: white; padding: 30px; border: 1px solid #bdc3c7; width: 350px; border-radius: 4px; }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box; }
+        button { background-color: #3b5998; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background-color: #2d4373; }
+        #mensaje { margin-top: 15px; color: green; font-weight: bold; text-align: center; }
+    </style>
+</head>
+<body>
+
+<header>thirty</header>
+
+<div class="container">
+    <div class="card">
+        <h2 style="color: #3b5998; margin-top: 0;">Crea tu perfil</h2>
+        <input type="text" id="firstName" placeholder="Nombre">
+        <input type="text" id="lastName" placeholder="Apellido">
+        <input type="email" id="email" placeholder="Correo electrónico">
+        <input type="password" id="password" placeholder="Contraseña">
+        <button onclick="enviarRegistro()">¡Regístrate!</button>
+        <div id="mensaje"></div>
+    </div>
+</div>
+
+<script>
+    async function enviarRegistro() {
+        const usuario = {
+            firstName: document.getElementById('firstName').value,
+            lastName: document.getElementById('lastName').value,
+            email: document.getElementById('email').value,
+            passwordHash: document.getElementById('password').value, // En el futuro lo encriptaremos
+            bio: "¡Hola! Ya estoy en Thirty."
+        };
+
+        try {
+            const response = await fetch('http://localhost:8080/api/users/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(usuario)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Guardamos el nombre para usarlo en la siguiente página
+                localStorage.setItem('usuarioNombre', data.firstName);
+                // ¡Redirección mágica!
+                window.location.href = "home.html";
+            } else {
+                document.getElementById('mensaje').style.color = "red";
+                document.getElementById('mensaje').innerText = "Error al registrar.";
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+</script>
+
+</body>
+</html>

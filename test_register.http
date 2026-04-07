@@ -1,0 +1,11 @@
+### Probar el registro de un nuevo usuario en Thirty
+POST http://localhost:8080/api/users/register
+Content-Type: application/json
+
+{
+  "firstName": "Sergio",
+  "lastName": "Thirty",
+  "email": "sergio@thirty.com",
+  "passwordHash": "seguridad123",
+  "bio": "De Tuenti a Thirty. ¡Ya estamos aquí!"
+}
