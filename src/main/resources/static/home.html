@@ -3,117 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <title>Thirty - Inicio</title>
+    <script src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body { background-color: #e9eff4; font-family: 'Segoe UI', sans-serif; margin: 0; }
-        header { background-color: #3b5998; color: white; padding: 10px 15%; display: flex; align-items: center; justify-content: space-between; }
-
+        header { background: linear-gradient(to bottom, #4c66a4 0%, #3b5998 100%); border-bottom: 1px solid #2d4373; color: white; padding: 0 15%; height: 42px; display: flex; align-items: center; font-size: 12px; font-weight: bold; }
         .main-grid { display: grid; grid-template-columns: 200px 1fr 250px; gap: 20px; padding: 20px 15%; }
-
         .card { background: white; padding: 15px; border: 1px solid #bdc3c7; margin-bottom: 15px; border-radius: 2px; }
         h5 { margin-top:0; border-bottom: 1px solid #eee; padding-bottom: 5px; color: #3b5998; }
 
-        /* Estilo Redes Sociales */
         .social-links { list-style: none; padding: 0; }
         .social-links li { margin-bottom: 12px; display: flex; align-items: center; font-size: 14px; }
+        .social-links a { text-decoration: none; color: #333; display: flex; align-items: center; width: 100%; }
         .social-links i { margin-right: 10px; width: 20px; text-align: center; font-size: 18px; }
-        .fa-instagram { color: #E1306C; }
-        .fa-linkedin { color: #0077b5; }
-        .fa-x-twitter { color: #000; }
-        .fa-facebook { color: #1877F2; }
-        .fa-tiktok { color: #000; }
 
-        /* Cumpleaños */
-        .cumple-item { display: flex; align-items: center; font-size: 13px; margin-top: 10px; }
-        .cumple-icon { color: #f39c12; margin-right: 8px; }
-
-        /* Muro Central */
-        .center-col .status-box { background: white; padding: 15px; border: 1px solid #bdc3c7; margin-bottom: 20px; }
+        .center-col .status-box { background: white; padding: 15px; border: 1px solid #bdc3c7; margin-bottom: 20px; position: relative; }
         .status-box textarea { width: 100%; border: 1px solid #ccc; padding: 10px; box-sizing: border-box; resize: none; border-radius: 4px; }
 
-        .feed-title { font-weight: bold; color: #666; margin-bottom: 10px; display: block; border-bottom: 1px solid #ccc; }
         .post { background: white; padding: 15px; border: 1px solid #bdc3c7; margin-bottom: 15px; display: flex; gap: 10px; }
-        .post img { width: 50px; height: 50px; border-radius: 4px; }
-        .post-content { flex: 1; }
+        .post img.avatar { width: 50px; height: 50px; border-radius: 4px; object-fit: cover; }
+        .post-content { flex: 1; overflow: hidden; }
         .post-header { font-weight: bold; color: #3b5998; margin-bottom: 5px; }
-        .post-time { font-size: 11px; color: #999; }
-        header {
-            background: linear-gradient(to bottom, #4c66a4 0%, #3b5998 100%);
-            border-bottom: 1px solid #2d4373;
-            color: white;
-            padding: 0 15%; /* Centrado estilo Tuenti */
-            height: 42px;
-            display: flex;
-            align-items: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
+        .post-time { font-size: 11px; color: #999; margin-top: 8px; }
 
-        .nav-item {
-            padding: 0 12px;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            border-right: 1px solid rgba(255,255,255,0.1);
-            text-decoration: none;
-            color: white;
-        }
+        .nav-item { padding: 0 12px; height: 100%; display: flex; align-items: center; cursor: pointer; border-right: 1px solid rgba(255,255,255,0.1); text-decoration: none; color: white; }
+        .nav-item:hover { background-color: rgba(0,0,0,0.1); }
+        .nav-active { background-color: #2d4373; }
 
-        .nav-item:hover {
-            background-color: rgba(0,0,0,0.1);
-        }
+        #emoji-picker-container { position: absolute; z-index: 999; top: 100%; left: 0; display: none; margin-top: 5px; }
 
-        .nav-active {
-            background-color: #2d4373; /* El azul más oscuro para el item seleccionado */
-        }
-
-        .search-bar {
-            background: white;
-            border: none;
-            padding: 3px 10px;
-            margin-left: 15px;
-            width: 150px;
-            height: 20px;
-            font-size: 11px;
-            border-radius: 2px;
-        }
-
-        .btn-subir {
-            background: linear-gradient(to bottom, #5b74a8 0%, #2d4373 100%);
-            border: 1px solid #1d2a4a;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 3px;
-            margin-left: 10px;
-            font-size: 11px;
-            cursor: pointer;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
-        }
-
-        .header-right {
-            margin-left: auto;
-            display: flex;
-            gap: 15px;
-        }
+        /* Ajuste para que los tweets no se vean gigantes */
+        .twitter-tweet { margin: 10px 0 !important; }
     </style>
 </head>
 <body>
 
 <header>
     <div style="font-size: 20px; margin-right: 20px;">thirty</div>
-
     <a href="home.html" class="nav-item nav-active">Inicio</a>
     <a href="#" class="nav-item">Perfil</a>
     <a href="#" class="nav-item">Mensajes</a>
-    <a href="#" class="nav-item">Gente</a>
+    <a href="#" class="nav-item" onclick="mostrarGente()">Gente</a>
     <a href="#" class="nav-item">Vídeos</a>
-
-    <input type="text" class="search-bar" placeholder="Buscar...">
-
-    <button class="btn-subir">Subir fotos ⬆</button>
-
-    <div class="header-right">
+    <div class="header-right" style="margin-left: auto; display: flex; gap: 15px;">
         <a href="#" style="color:white; text-decoration:none;">Mi cuenta</a>
         <a href="login.html" onclick="localStorage.clear()" style="color:white; text-decoration:none;">Salir</a>
     </div>
@@ -122,129 +54,325 @@
 <div class="main-grid">
     <div class="left-col">
         <div class="card">
-            <img src="https://via.placeholder.com/150" style="width: 100%; margin-bottom:10px;" alt="Foto Perfil">
-            <h4 id="userName" style="margin:0; text-align:center;">Usuario</h4>
+            <input type="file" id="inputFoto" style="display: none;" accept="image/*" onchange="subirFoto()">
+            <div class="profile-container" onclick="document.getElementById('inputFoto').click()" style="text-align:center; cursor:pointer;">
+                <img id="userImg" src="https://via.placeholder.com/100" style="width: 100px; height: 100px; object-fit: cover; border-radius: 2px;">
+                <div style="font-size: 10px; color: #3b5998; margin-top: 2px;">Cambiar foto</div>
+            </div>
+            <h4 id="userName" style="margin:5px 0 0 0; text-align:center;">Usuario</h4>
         </div>
 
         <div class="card">
             <h5>Mis Redes</h5>
             <ul class="social-links">
-                <li><i class="fab fa-instagram"></i> Instagram</li>
-                <li><i class="fab fa-linkedin"></i> LinkedIn</li>
-
-                <li><i class="fa-brands fa-x-twitter"></i> X (Twitter)</li>
-
-                <li><i class="fab fa-tiktok"></i> TikTok</li>
-                <li><i class="fab fa-facebook"></i> Facebook</li>
+                <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
+                <li><a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
+                <li><a href="#"><i class="fa-brands fa-x-twitter"></i> X (Twitter)</a></li>
+                <li><a href="#"><i class="fab fa-tiktok"></i> TikTok</a></li>
+                <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
             </ul>
-        </div>
-
-        <div class="card">
-            <h5>Próximos Cumpleaños</h5>
-            <div class="cumple-item">
-                <i class="fas fa-cake-candles cumple-icon"></i>
-                <span><strong>Hoy:</strong> Sergio Thirty</span>
-            </div>
-            <div class="cumple-item">
-                <i class="fas fa-cake-candles cumple-icon" style="opacity: 0.5;"></i>
-                <span>Mañana: María López</span>
-            </div>
         </div>
     </div>
 
     <div class="center-col">
         <div class="status-box">
             <textarea id="textoPost" placeholder="¿Qué hay de nuevo, treintañero?" rows="2"></textarea>
-            <button onclick="publicarMensaje()" style="float:right; margin-top:5px; background:#3b5998; color:white; border:none; padding:6px 20px; cursor:pointer; font-weight:bold;">Publicar</button>
-            <div style="clear:both;"></div>
+            <div id="emoji-picker-container"></div>
+            <div style="margin-top:5px; display: flex; justify-content: space-between; align-items: center;">
+                <button type="button" id="emoji-trigger" style="background:none; border:none; cursor:pointer; font-size:20px;">😊</button>
+                <button onclick="publicarMensaje()" style="background:#3b5998; color:white; border:none; padding:6px 20px; cursor:pointer; font-weight:bold;">Publicar</button>
+            </div>
         </div>
-
         <span class="feed-title">Novedades de tus amistades</span>
-
-        <div id="muro">
-        </div>
+        <div id="muro"></div>
     </div>
 
     <div class="right-col">
         <div class="card" style="padding:0; height: 450px; display: flex; flex-direction: column;">
-            <div style="background: #f6f7f9; padding: 10px; border-bottom: 1px solid #bdc3c7; font-weight: bold; font-size: 13px;">
-                Chat (2)
-            </div>
+            <div style="background: #f6f7f9; padding: 10px; border-bottom: 1px solid #bdc3c7; font-weight: bold; font-size: 13px;">Chat (2)</div>
             <div style="flex:1; padding:10px; font-size:12px; color: #444;">
                 <div style="margin-bottom:8px;">● Sergio Thirty</div>
                 <div style="margin-bottom:8px;">● Dani DAM</div>
-                <div style="color:#999; margin-top:20px;">○ María López (Desconectado)</div>
             </div>
+        </div>
+    </div>
+    <div class="card">
+        <h4>Contactos</h4>
+        <div id="lista-contactos">
         </div>
     </div>
 </div>
 
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<script type="module">
+    import { Picker } from 'https://cdn.jsdelivr.net/npm/emoji-mart@5.5.2/+esm'
+    const pickerOptions = {
+        onEmojiSelect: (emoji) => {
+            const textarea = document.getElementById('textoPost');
+            textarea.value += emoji.native;
+            document.getElementById('emoji-picker-container').style.display = 'none';
+        },
+        locale: 'es', theme: 'light'
+    }
+    const picker = new Picker(pickerOptions);
+    document.getElementById('emoji-picker-container').appendChild(picker);
+    window.toggleEmojiPicker = () => {
+        const container = document.getElementById('emoji-picker-container');
+        container.style.display = (container.style.display === 'none' || container.style.display === '') ? 'block' : 'none';
+    }
+    document.getElementById('emoji-trigger').addEventListener('click', window.toggleEmojiPicker);
+</script>
+
 <script>
+    function parsearContenido(texto) {
+        if (!texto) return "";
+
+        // 1. Detectar X/Twitter y LIMPIAR el enlace
+        const twitterRegex = /(https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/(\d+))/gi;
+
+        if (twitterRegex.test(texto)) {
+            texto = texto.replace(twitterRegex, (url) => {
+                // Extraemos solo la parte base del link (sin ?s=20 ni cosas raras)
+                const baseUrl = url.split('?')[0].replace('x.com', 'twitter.com');
+                return `<div style="margin:15px 0;">
+                            <blockquote class="twitter-tweet" data-conversation="none" data-theme="light">
+                                <a href="${baseUrl}"></a>
+                            </blockquote>
+                        </div>`;
+            });
+        }
+
+        // 2. YouTube
+        const ytRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/gi;
+        texto = texto.replace(ytRegex, '<div style="margin:10px 0; position:relative; padding-bottom:56.25%; height:0; overflow:hidden;"><iframe style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:8px;" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>');
+
+        // 3. Imágenes (Evitamos procesar imágenes que ya vienen dentro del tweet)
+        const imgRegex = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp))/gi;
+        texto = texto.replace(imgRegex, (url) => {
+            if (url.includes('twimg.com') || url.includes('twitter.com')) return url;
+            return `<img src="${url}" style="max-width:100%; border-radius:8px; margin-top:10px; display:block;">`;
+        });
+
+        return texto;
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const nombre = localStorage.getItem('usuarioNombre');
-        if (nombre) {
-            document.getElementById('userName').innerText = nombre;
-        }
+        const foto = localStorage.getItem('usuarioFoto');
+        if (nombre) document.getElementById('userName').innerText = nombre;
+        if (foto && foto !== 'null') document.getElementById('userImg').src = '/uploads/' + foto;
+        cargarPosts();
     });
-    // 1. Función para publicar un mensaje
-    async function publicarMensaje() {
-        const elementoTexto = document.getElementById('textoPost');
-        const texto = elementoTexto.value.trim(); // .trim() quita espacios vacíos
-        const nombre = localStorage.getItem('usuarioNombre') || "Anónimo";
 
-        if (!texto) {
-            alert("¡Escribe algo antes de publicar!");
-            return;
-        }
+    async function cargarPosts() {
+        try {
+            const response = await fetch('http://localhost:8080/api/posts');
+            const posts = await response.json();
+            const muro = document.getElementById('muro');
+            const miNombre = localStorage.getItem('usuarioNombre');
+            const miFoto = localStorage.getItem('usuarioFoto');
+
+            muro.innerHTML = "";
+            posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+            posts.forEach(post => {
+                const fecha = new Date(post.createdAt).toLocaleString();
+                const contenidoParsed = parsearContenido(post.content);
+                const avatarUrl = (post.author === miNombre && miFoto && miFoto !== 'null')
+                    ? '/uploads/' + miFoto
+                    : `https://ui-avatars.com/api/?name=${post.author}&background=3b5998&color=fff`;
+
+                // SOLO mostramos el botón de borrar si el autor es el usuario actual
+                const botonBorrar = (post.author === miNombre)
+                    ? `<i class="fas fa-trash-alt" onclick="borrarPost(${post.id})" style="cursor:pointer; color:#ccc; font-size:12px; float:right;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#ccc'"></i>`
+                    : "";
+
+                muro.innerHTML += `
+                    <div class="post" id="post-${post.id}">
+                        <img src="${avatarUrl}" class="avatar">
+                        <div class="post-content">
+                            <div class="post-header">
+                                ${botonBorrar}
+                                <span style="color:#3b5998; font-weight:bold;">${post.author}</span>
+                            </div>
+                            <div style="white-space: pre-wrap; font-size:14px; margin-top:5px;">${contenidoParsed}</div>
+                            <div class="post-time">${fecha}</div>
+                        </div>
+                    </div>`;
+            });
+
+            if (window.twttr && window.twttr.widgets) {
+                window.twttr.widgets.load();
+            }
+        } catch (e) { console.error("Error al cargar posts"); }
+    }
+    async function borrarPost(id) {
+        if (!confirm("¿Seguro que quieres borrar este recuerdo de Thirty?")) return;
 
         try {
-            const response = await fetch('http://localhost:8080/api/posts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    author: nombre,
-                    content: texto
-                })
+            const response = await fetch(`http://localhost:8080/api/posts/${id}`, {
+                method: 'DELETE'
             });
 
             if (response.ok) {
-                elementoTexto.value = ""; // Limpiar el cuadro después de enviar
-                await cargarPosts();      // Forzar la recarga del muro
+                // Animación rápida: ocultamos el post antes de recargar
+                document.getElementById(`post-${id}`).style.opacity = '0';
+                setTimeout(() => cargarPosts(), 300);
             } else {
-                alert("Error al guardar en la base de datos");
+                alert("No se pudo borrar el post.");
             }
         } catch (error) {
-            console.error("Error de conexión:", error);
-            alert("No se pudo conectar con el servidor. ¿Está encendido el Play verde?");
+            console.error("Error:", error);
         }
     }
 
-    // 2. Función para cargar los posts de la DB y pintarlos en el muro
-    async function cargarPosts() {
-        const response = await fetch('http://localhost:8080/api/posts');
-        const posts = await response.json();
-
-        const muro = document.getElementById('muro');
-        muro.innerHTML = ""; // Limpiar posts antiguos
-
-        posts.forEach(post => {
-            const fecha = new Date(post.createdAt).toLocaleTimeString();
-            muro.innerHTML += `
-                <div class="post">
-                    <img src="https://ui-avatars.com/api/?name=${post.author}&background=3b5998&color=fff" alt="Avatar">
-                    <div class="post-content">
-                        <div class="post-header">${post.author}</div>
-                        <div>${post.content}</div>
-                        <div class="post-time">Publicado a las ${fecha}</div>
-                    </div>
-                </div>
-            `;
-        });
+    async function publicarMensaje() {
+        const el = document.getElementById('textoPost');
+        const nombre = localStorage.getItem('usuarioNombre') || "Treintañero";
+        if (!el.value.trim()) return;
+        try {
+            await fetch('http://localhost:8080/api/posts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ author: nombre, content: el.value })
+            });
+            el.value = "";
+            cargarPosts();
+        } catch (e) { alert("Error"); }
     }
 
-    // Llamar a cargarPosts al entrar en la página
-    document.addEventListener('DOMContentLoaded', cargarPosts);
-</script>
+    async function subirFoto() {
+        const input = document.getElementById('inputFoto');
+        const userId = localStorage.getItem('usuarioId');
+        if (!input.files[0] || !userId) return;
+        const formData = new FormData();
+        formData.append("file", input.files[0]);
+        try {
+            const response = await fetch(`/api/users/${userId}/upload-foto`, { method: 'POST', body: formData });
+            if (response.ok) {
+                const nombreArchivo = await response.text();
+                localStorage.setItem('usuarioFoto', nombreArchivo);
+                location.reload();
+            }
+        } catch (e) { alert("Error foto"); }
+    }
 
+    async function mostrarGente() {
+        const miId = localStorage.getItem('usuarioId');
+        const muro = document.getElementById('muro');
+
+        // Cambiamos el título visualmente
+        document.querySelector('.feed-title').innerText = "Descubre a otros Treintañeros";
+        muro.innerHTML = "<p style='text-align:center;'>Buscando gente...</p>";
+
+        try {
+            const response = await fetch('http://localhost:8080/api/users');
+            const usuarios = await response.json();
+
+            muro.innerHTML = ""; // Limpiamos
+
+            usuarios.forEach(user => {
+                // No nos mostramos a nosotros mismos
+                if (user.id == miId) return;
+
+                muro.innerHTML += `
+                    <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:15px; margin-bottom:10px;">
+                        <div style="display:flex; align-items:center; gap:15px;">
+                            <img src="${user.fotoPerfil ? '/uploads/'+user.fotoPerfil : 'https://ui-avatars.com/api/?name='+user.firstName}"
+                                 style="width:50px; height:50px; border-radius:50%; object-fit:cover; border: 2px solid #3b5998;">
+                            <div>
+                                <div style="font-weight:bold; color:#3b5998;">${user.firstName} ${user.lastName}</div>
+                                <div style="font-size:12px; color:#666;">${user.bio || 'Sin biografía'}</div>
+                            </div>
+                        </div>
+                        <button onclick="agregarAmigo(${user.id})" style="background:#3b5998; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer; font-weight:bold;">
+                            <i class="fas fa-user-plus"></i> Agregar
+                        </button>
+                    </div>`;
+            });
+        } catch (e) {
+            muro.innerHTML = "Error al cargar la lista de usuarios.";
+        }
+    }
+
+    async function agregarAmigo(amigoId) {
+        const miId = localStorage.getItem('usuarioId');
+
+        try {
+            const res = await fetch(`http://localhost:8080/api/users/${miId}/agregar/${amigoId}`, {
+                method: 'POST'
+            });
+
+            if (res.ok) {
+                alert("¡Ahora sois amigos! Ya puedes chatear con esta persona.");
+                location.reload(); // Recargamos para volver al inicio
+            }
+        } catch (e) {
+            alert("Hubo un error al agregar.");
+        }
+    }
+    // Llama a esta función dentro de tu DOMContentLoaded
+    async function cargarMisAmigos() {
+        const miId = localStorage.getItem('usuarioId');
+        const listaAmigosDiv = document.getElementById('lista-amigos-chat'); // Asegúrate de que este ID exista en tu HTML lateral
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/users/${miId}/amigos`);
+            const amigos = await response.json();
+
+            listaAmigosDiv.innerHTML = ""; // Limpiar los estáticos (Sergio, Dani...)
+
+            amigos.forEach(amigo => {
+                listaAmigosDiv.innerHTML += `
+                    <div class="amigo-item" onclick="seleccionarChat('${amigo.id}', '${amigo.firstName}')"
+                         style="display:flex; align-items:center; gap:10px; margin-bottom:10px; cursor:pointer; padding:5px; border-radius:5px;">
+                        <div style="width:10px; height:10px; background:#2ecc71; border-radius:50%;"></div>
+                        <span style="font-weight:500;">${amigo.firstName} ${amigo.lastName}</span>
+                    </div>
+                `;
+            });
+        } catch (e) {
+            console.error("Error al cargar amigos:", e);
+        }
+    }
+    async function cargarAmigosSidebar() {
+        const miId = localStorage.getItem('usuarioId');
+        const contenedor = document.getElementById('lista-contactos');
+
+        if (!miId) return;
+
+        try {
+            // Llamamos al endpoint de amigos que creamos en Java
+            const response = await fetch(`http://localhost:8080/api/users/${miId}/amigos`);
+            const amigos = await response.json();
+
+            if (amigos.length === 0) {
+                contenedor.innerHTML = "<p style='color:gray; font-size:12px;'>Aún no tienes amigos.</p>";
+                return;
+            }
+
+            contenedor.innerHTML = ""; // Limpiamos "Sergio" y "Dani" (los de prueba)
+
+            amigos.forEach(amigo => {
+                contenedor.innerHTML += `
+                    <div onclick="abrirChat('${amigo.id}', '${amigo.firstName}')"
+                         style="display:flex; align-items:center; gap:10px; margin-bottom:12px; cursor:pointer;">
+                        <div style="width:8px; height:8px; background:#2ecc71; border-radius:50%;"></div>
+                        <span style="font-size:14px; font-weight:500;">${amigo.firstName} ${amigo.lastName}</span>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error("Error cargando el chat:", error);
+        }
+    }
+
+    // Ejecutar la función cuando cargue la página
+    document.addEventListener('DOMContentLoaded', () => {
+        cargarAmigosSidebar();
+        // ... tus otras funciones de posts ...
+    });
+</script>
 </body>
 </html>

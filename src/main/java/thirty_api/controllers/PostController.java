@@ -1,5 +1,6 @@
 package thirty_api.controllers;
 
+import org.springframework.http.ResponseEntity;
 import thirty_api.models.Post;
 import thirty_api.repositories.PostRepository;
 import org.springframework.web.bind.annotation.*;
@@ -30,5 +31,10 @@ public class PostController {
     public Post createPost(@RequestBody Post post) {
         post.setCreatedAt(LocalDateTime.now());
         return postRepository.save(post);
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarPost(@PathVariable Long id) {
+        postRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

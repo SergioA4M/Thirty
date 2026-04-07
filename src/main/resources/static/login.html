@@ -80,8 +80,15 @@
             const encontrado = usuarios.find(u => u.email === email && u.passwordHash === pass);
 
             if (encontrado) {
-                // Guardamos su nombre para el muro
+                // 1. Guardamos el nombre para mostrarlo en el saludo
                 localStorage.setItem('usuarioNombre', encontrado.firstName);
+
+                // 2. ¡MUY IMPORTANTE! Guardamos el ID para poder subir la foto luego
+                localStorage.setItem('usuarioId', encontrado.id);
+
+                // 3. Guardamos también la foto actual (si ya tiene una)
+                localStorage.setItem('usuarioFoto', encontrado.fotoPerfil || '');
+
                 window.location.href = "home.html";
             } else {
                 errorDiv.innerText = "Usuario o contraseña incorrectos";
