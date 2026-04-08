@@ -25,6 +25,21 @@ public class UserController {
     public User registerUser(@RequestBody User user) {
         return userRepository.save(user);
     }
+    // --- MÉTODO DE LOGIN (AÑADE ESTO) ---
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody User loginData) {
+        // 1. Buscamos al usuario por el email
+        User user = userRepository.findByEmail(loginData.getEmail());
+
+        // 2. Comprobamos si existe y si la contraseña coincide
+        if (user != null && user.getPasswordHash().equals(loginData.getPasswordHash())) {
+            // Si es correcto, devolvemos el usuario para que el JS guarde su ID
+            return ResponseEntity.ok(user);
+        } else {
+            // Si falla, devolvemos error 401 (No autorizado)
+            return ResponseEntity.status(401).body("Email o contraseña incorrectos");
+        }
+    }
 
     // --- MÉTODO PARA LA FOTO DE PERFIL ---
     @PostMapping("/{id}/upload-foto")
@@ -88,5 +103,27 @@ public class UserController {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         return ResponseEntity.ok(usuario.getAmigos());
     }
+    @PutMapping("/{id}/perfil")
+    public ResponseEntity<User> actualizarPerfil(@PathVariable Long id, @RequestBody User datos) {
+        return userRepository.findById(id).map(user -> {
+            // Actualizamos los campos nuevos estilo Tuenti
+            user.setBio(datos.getBio());
+            user.setEstudios(datos.getEstudios());
+            user.setTrayectoria(datos.getTrayectoria());
+            user.setColegios(datos.getColegios());
+            user.setZonasMarcha(datos.getZonasMarcha());
+
+            User guardado = userRepository.save(user);
+            return ResponseEntity.ok(guardado);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+    // 3. Obtener UN SOLO usuario por ID (Fundamental para cargar el perfil)
+    @GetMapping("/{id}")
+    public ResponseEntity<User> obtenerUsuario(@PathVariable Long id) {
+        return userRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 
 }

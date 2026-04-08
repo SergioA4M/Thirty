@@ -41,10 +41,9 @@
 <header>
     <div style="font-size: 20px; margin-right: 20px;">thirty</div>
     <a href="home.html" class="nav-item nav-active">Inicio</a>
-    <a href="#" class="nav-item">Perfil</a>
+    <a href="perfil.html" onclick="window.location.href='perfil.html'; return false;" class="nav-item">Perfil</a>
     <a href="#" class="nav-item">Mensajes</a>
     <a href="#" class="nav-item" onclick="mostrarGente()">Gente</a>
-    <a href="#" class="nav-item">Vídeos</a>
     <div class="header-right" style="margin-left: auto; display: flex; gap: 15px;">
         <a href="#" style="color:white; text-decoration:none;">Mi cuenta</a>
         <a href="login.html" onclick="localStorage.clear()" style="color:white; text-decoration:none;">Salir</a>
@@ -72,6 +71,12 @@
                 <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
             </ul>
         </div>
+
+        <div class="card">
+            <h4 style="margin-top:0; font-size: 14px; color: #3b5998; border-bottom: 1px solid #eee; padding-bottom: 5px;">Contactos</h4>
+            <div id="lista-contactos">
+            </div>
+        </div>
     </div>
 
     <div class="center-col">
@@ -88,17 +93,23 @@
     </div>
 
     <div class="right-col">
-        <div class="card" style="padding:0; height: 450px; display: flex; flex-direction: column;">
-            <div style="background: #f6f7f9; padding: 10px; border-bottom: 1px solid #bdc3c7; font-weight: bold; font-size: 13px;">Chat (2)</div>
-            <div style="flex:1; padding:10px; font-size:12px; color: #444;">
-                <div style="margin-bottom:8px;">● Sergio Thirty</div>
-                <div style="margin-bottom:8px;">● Dani DAM</div>
+        <div class="card" style="padding:0; height: 500px; display: flex; flex-direction: column;">
+            <div id="chat-header" style="background: #f6f7f9; padding: 10px; border-bottom: 1px solid #bdc3c7; font-weight: bold; font-size: 13px; color: #3b5998;">
+                Selecciona un contacto
             </div>
-        </div>
-    </div>
-    <div class="card">
-        <h4>Contactos</h4>
-        <div id="lista-contactos">
+
+            <div id="chat-window" style="flex:1; padding:10px; font-size:13px; overflow-y: auto; background: #f0f2f5;">
+                <p style="color:gray; text-align:center; margin-top:50px;">Haz clic en un amigo para hablar</p>
+            </div>
+
+            <div id="chat-input-area" style="padding: 10px; border-top: 1px solid #bdc3c7; display:none;">
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="mensajeTexto" placeholder="Escribe un mensaje..." style="flex:1; border:1px solid #ccc; border-radius:15px; padding:5px 12px; outline:none;">
+                    <button onclick="enviarMensajeChat()" style="background:#3b5998; color:white; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -163,6 +174,14 @@
         if (nombre) document.getElementById('userName').innerText = nombre;
         if (foto && foto !== 'null') document.getElementById('userImg').src = '/uploads/' + foto;
         cargarPosts();
+        const inputChat = document.getElementById('mensajeTexto');
+        if (inputChat) {
+            inputChat.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    enviarMensajeChat();
+                }
+            });
+        }
     });
 
     async function cargarPosts() {
@@ -373,6 +392,80 @@
         cargarAmigosSidebar();
         // ... tus otras funciones de posts ...
     });
+
+    let receptorIdActual = null; // Variable global para saber con quién hablamos
+
+    async function abrirChat(amigoId, amigoNombre) {
+        receptorIdActual = amigoId;
+        const miId = localStorage.getItem('usuarioId');
+
+        // 1. Cambiamos la interfaz
+        document.getElementById('chat-header').innerText = "Chat con " + amigoNombre;
+        document.getElementById('chat-input-area').style.display = 'block';
+
+        // 2. Cargamos el historial
+        actualizarMensajes();
+    }
+    // ESTA ES LA LÍNEA MÁGICA:
+    window.abrirChat = abrirChat;
+
+    async function actualizarMensajes() {
+        if (!receptorIdActual) return;
+        const miId = localStorage.getItem('usuarioId');
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/mensajes/historial/${miId}/${receptorIdActual}`);
+            const mensajes = await response.json();
+            const win = document.getElementById('chat-window');
+
+            win.innerHTML = "";
+            mensajes.forEach(m => {
+                const soyYo = m.emisor.id == miId;
+                const alineacion = soyYo ? 'text-align:right;' : 'text-align:left;';
+                const color = soyYo ? '#dcf8c6' : 'white'; // Verde clarito para mis mensajes, blanco para el otro
+
+                win.innerHTML += `
+                    <div style="${alineacion} margin-bottom:10px;">
+                        <span style="background:${color}; padding:6px 10px; border-radius:8px; display:inline-block; max-width:80%; box-shadow:0 1px 1px rgba(0,0,0,0.1); word-wrap:break-word;">
+                            ${m.contenido}
+                        </span>
+                    </div>`;
+            });
+
+            // Auto-scroll al final
+            win.scrollTop = win.scrollHeight;
+        } catch (e) { console.error("Error historial"); }
+    }
+
+    async function enviarMensajeChat() {
+        const input = document.getElementById('mensajeTexto');
+        const miId = localStorage.getItem('usuarioId');
+        const texto = input.value.trim();
+
+        if (!texto || !receptorIdActual) return;
+
+        try {
+            const res = await fetch(`http://localhost:8080/api/mensajes/enviar?emisorId=${miId}&receptorId=${receptorIdActual}`, {
+                method: 'POST',
+                body: texto
+            });
+
+            if (res.ok) {
+                input.value = ""; // Limpiamos el input
+                actualizarMensajes(); // <--- ESTO hace que aparezca tu mensaje nada más enviarlo
+            }
+        } catch (e) {
+            console.error("Error al enviar el mensaje");
+        }
+    }
+    window.enviarMensajeChat = enviarMensajeChat;
+
+    // Cada 3 segundos, si hay un chat abierto, refresca los mensajes
+    setInterval(() => {
+        if (receptorIdActual) {
+            actualizarMensajes();
+        }
+    }, 3000);
 </script>
 </body>
 </html>

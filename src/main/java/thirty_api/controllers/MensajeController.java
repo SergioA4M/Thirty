@@ -1,9 +1,10 @@
 package thirty_api.controllers;
 
-import thirty_api.models.Mensaje;
-import thirty_api.repositories.MensajeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import thirty_api.models.Mensaje;
+import thirty_api.repositories.MensajeRepository;
+import thirty_api.repositories.UserRepository;
 import java.util.List;
 
 @RestController
@@ -11,16 +12,22 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class MensajeController {
 
-    @Autowired
-    private MensajeRepository mensajeRepository;
+    @Autowired private MensajeRepository mensajeRepository;
+    @Autowired private UserRepository userRepository;
 
-    @PostMapping
-    public Mensaje enviarMensaje(@RequestBody Mensaje mensaje) {
-        return mensajeRepository.save(mensaje);
+    // Enviar un mensaje
+    @PostMapping("/enviar")
+    public Mensaje enviar(@RequestParam Long emisorId, @RequestParam Long receptorId, @RequestBody String texto) {
+        Mensaje m = new Mensaje();
+        m.setEmisor(userRepository.findById(emisorId).get());
+        m.setReceptor(userRepository.findById(receptorId).get());
+        m.setContenido(texto);
+        return mensajeRepository.save(m);
     }
 
-    @GetMapping("/{u1}/{u2}")
-    public List<Mensaje> obtenerChat(@PathVariable String u1, @PathVariable String u2) {
-        return mensajeRepository.findChat(u1, u2);
+    // Leer la conversación
+    @GetMapping("/historial/{id1}/{id2}")
+    public List<Mensaje> historial(@PathVariable Long id1, @PathVariable Long id2) {
+        return mensajeRepository.buscarConversacion(id1, id2);
     }
 }

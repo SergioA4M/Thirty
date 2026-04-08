@@ -1,6 +1,7 @@
 package thirty_api.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore; // IMPORTANTE: Para evitar el bucle infinito en JSON
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty; // Nueva importación necesaria
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,10 +30,18 @@ public class User {
     private String email;
 
     @Column(nullable = false)
+    // Cambiado: Ahora permite registrarse (escribir) pero protege la salida (leer)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String passwordHash;
 
-    private String bio;
+    // --- CAMPOS ESTILO TUENTI ---
+    private String bio;           // Estado actual (Burbuja de texto)
     private String fotoPerfil;
+    private String estudios;      // Ej: "Licenciatura en Antropología"
+    private String trayectoria;   // Ej: "Abogados Sauceda"
+    private String colegios;      // Ej: "San José de Calasanz"
+    private String zonasMarcha;   // Ej: "Ocho y medio, Madrid"
+    // ----------------------------
 
     @ManyToMany
     @JoinTable(
@@ -40,7 +49,7 @@ public class User {
             joinColumns = @JoinColumn(name = "usuario_id"),
             inverseJoinColumns = @JoinColumn(name = "amigo_id")
     )
-    @JsonIgnore // <--- Esto evita el error "Document nesting depth (501)"
+    @JsonIgnore // Mantenemos este para evitar el bucle infinito de amigos
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<User> amigos = new HashSet<>();

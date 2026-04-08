@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Thirty - Perfil</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { background-color: #e9eff4; font-family: 'Segoe UI', sans-serif; margin: 0; }
+        header { background: #3b5998; color: white; padding: 0 15%; height: 42px; display: flex; align-items: center; font-weight: bold; }
+
+        .main-grid { display: grid; grid-template-columns: 250px 1fr 250px; gap: 20px; padding: 20px 15%; }
+        .card { background: white; padding: 15px; border: 1px solid #bdc3c7; margin-bottom: 15px; border-radius: 2px; }
+
+        /* Estilo Tuenti */
+        .user-name { font-size: 24px; color: #333; margin: 0; }
+        .info-label { color: #999; font-size: 11px; font-weight: bold; text-transform: uppercase; margin-top: 10px; }
+        .info-valor { color: #3b5998; font-size: 13px; text-decoration: none; display: block; margin-bottom: 5px; }
+
+        .nav-item { padding: 0 12px; color: white; text-decoration: none; font-size: 12px; }
+        .avatar-grande { width: 100%; border: 1px solid #ccc; padding: 4px; background: white; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-size: 20px; margin-right: 20px;">thirty</div>
+    <a href="home.html" class="nav-item nav-active">Inicio</a>
+    <a href="perfil.html" onclick="window.location.href='perfil.html'; return false;" class="nav-item">Perfil</a>
+    <a href="#" class="nav-item">Mensajes</a>
+    <a href="#" class="nav-item" onclick="mostrarGente()">Gente</a>
+    <div class="header-right" style="margin-left: auto; display: flex; gap: 15px;">
+        <a href="#" style="color:white; text-decoration:none;">Mi cuenta</a>
+        <a href="login.html" onclick="localStorage.clear()" style="color:white; text-decoration:none;">Salir</a>
+    </div>
+</header>
+
+<div class="main-grid">
+    <div class="left-col">
+        <div class="card">
+            <img id="perfilImg" src="https://via.placeholder.com/200" class="avatar-grande">
+        </div>
+
+        <div class="card">
+            <h5 style="margin-top:0; border-bottom:1px solid #eee; display: flex; justify-content: space-between;">
+                Información <i class="fas fa-edit" onclick="abrirModalPerfil()" style="cursor:pointer; font-size: 12px; color: #999;"></i>
+            </h5>
+
+            <div class="info-label">Estudios universitarios</div>
+            <div id="perfilEstudios" class="info-valor">Añadir universidad</div>
+
+            <div class="info-label">Trayectoria profesional</div>
+            <div id="perfilTrayectoria" class="info-valor">Añadir trabajo</div>
+
+            <div class="info-label">Zonas de marcha</div>
+            <div id="perfilZonas" class="info-valor">Añadir zonas...</div>
+        </div>
+
+        <div id="modalPerfil" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border:2px solid #3b5998; z-index:100; box-shadow: 0 0 15px rgba(0,0,0,0.3); border-radius: 4px; width: 300px;">
+            <h4 style="margin-top:0">Editar Perfil</h4>
+            <input type="text" id="editBio" placeholder="Estado (Bio)" style="width:90%; margin-bottom:10px;">
+            <input type="text" id="editEstudios" placeholder="Estudios" style="width:90%; margin-bottom:10px;">
+            <input type="text" id="editTrayectoria" placeholder="Trayectoria" style="width:90%; margin-bottom:10px;">
+            <input type="text" id="editZonas" placeholder="Zonas de marcha" style="width:90%; margin-bottom:10px;">
+            <div style="text-align:right;">
+                <button onclick="cerrarModalPerfil()">Cancelar</button>
+                <button onclick="guardarPerfil()" style="background:#3b5998; color:white; border:none; padding:5px 10px;">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="center-col">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h1 id="perfilNombreCompleto" class="user-name">Cargando...</h1>
+            <button style="background:#eee; border:1px solid #ccc; padding:5px 10px; cursor:pointer; font-size:12px;">
+                <i class="fas fa-lock"></i> Solo amigos
+            </button>
+        </div>
+
+        <div class="card" style="background: #f6f7f9;">
+            <div id="perfilBio" style="font-size: 14px; color: #444;">"¿Qué solecito mas bueno!"</div>
+        </div>
+
+        <h4 style="border-bottom: 1px solid #ccc; padding-bottom: 5px; color: #666;">Tablón</h4>
+        <div id="tablon">
+            <div class="card">
+                <textarea placeholder="Escribe algo en el tablón..." style="width:100%; border:1px solid #ddd;"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="right-col">
+        <div class="card">
+            <h5 style="margin-top:0;">Fotos</h5>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                <img src="https://via.placeholder.com/100" style="width:100%;">
+                <img src="https://via.placeholder.com/100" style="width:100%;">
+            </div>
+            <a href="#" style="font-size:11px; color:#3b5998;">Ver todas</a>
+        </div>
+
+        <div class="card">
+            <h5 style="margin-top:0;">Amigos (60)</h5>
+            <div id="listaAmigosPerfil" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; font-size: 10px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Al cargar la página, buscamos los datos del usuario
+    window.onload = async () => {
+        const id = localStorage.getItem('usuarioId');
+
+        if (!id) {
+            alert("No se ha detectado sesión. Por favor, inicia sesión.");
+            window.location.href = "login.html";
+            return;
+        }
+
+        try {
+            const resp = await fetch(`/api/users/${id}`);
+            if (resp.ok) {
+                const user = await resp.json();
+
+                // 2. Pintamos los datos (CORREGIDO: ahora coinciden con tus IDs del HTML)
+                document.getElementById('perfilNombreCompleto').innerText = user.firstName + " " + user.lastName;
+                document.getElementById('perfilBio').innerText = user.bio || "¿Qué solecito mas bueno!";
+                document.getElementById('perfilEstudios').innerText = user.estudios || "Añadir universidad";
+                document.getElementById('perfilTrayectoria').innerText = user.trayectoria || "Añadir trabajo";
+                document.getElementById('perfilZonas').innerText = user.zonasMarcha || "Añadir zonas...";
+
+                // La foto (usamos perfilImg que es el ID de tu <img>)
+                if (user.fotoPerfil) {
+                    document.getElementById('perfilImg').src = "/uploads/" + user.fotoPerfil;
+                }
+            }
+        } catch (error) {
+            console.error("Error cargando perfil:", error);
+        }
+    };
+
+    // 3. Funciones para el Modal (necesarias para que el botón de editar funcione)
+    function abrirModalPerfil() {
+        document.getElementById('modalPerfil').style.display = 'block';
+    }
+
+    function cerrarModalPerfil() {
+        document.getElementById('modalPerfil').style.display = 'none';
+    }
+
+    // 4. Guardar cambios (Asegúrate de que el botón del modal llame a guardarPerfil)
+    async function guardarPerfil() {
+        const id = localStorage.getItem('usuarioId');
+        const datos = {
+            bio: document.getElementById('editBio').value,
+            estudios: document.getElementById('editEstudios').value,
+            trayectoria: document.getElementById('editTrayectoria').value,
+            zonasMarcha: document.getElementById('editZonas').value
+        };
+
+        try {
+            const resp = await fetch(`/api/users/${id}/perfil`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datos)
+            });
+
+            if (resp.ok) {
+                alert("¡Perfil actualizado con éxito!");
+                cerrarModalPerfil();
+                location.reload();
+            }
+        } catch (error) {
+            alert("Error al conectar con el servidor");
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,12 +1,13 @@
 package thirty_api.repositories;
 
-import thirty_api.models.Mensaje;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import thirty_api.models.Mensaje;
 import java.util.List;
 
 public interface MensajeRepository extends JpaRepository<Mensaje, Long> {
-    @Query("SELECT m FROM Mensaje m WHERE (m.emisor = :u1 AND m.receptor = :u2) OR (m.emisor = :u2 AND m.receptor = :u1) ORDER BY m.fecha ASC")
-    List<Mensaje> findChat(@Param("u1") String u1, @Param("u2") String u2);
+
+    // Esta consulta busca la conversación entre dos usuarios (en ambos sentidos)
+    @Query("SELECT m FROM Mensaje m WHERE (m.emisor.id = ?1 AND m.receptor.id = ?2) OR (m.emisor.id = ?2 AND m.receptor.id = ?1) ORDER BY m.fechaEnvio ASC")
+    List<Mensaje> buscarConversacion(Long id1, Long id2);
 }

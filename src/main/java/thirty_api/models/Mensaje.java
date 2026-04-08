@@ -1,29 +1,32 @@
-package thirty_api.models; // Importante que coincida con tu carpeta
+package thirty_api.models;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
+@Data
 @Table(name = "mensajes")
 public class Mensaje {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String emisor;
-    private String receptor;
-    @Column(length = 1000)
+
+    @ManyToOne
+    @JoinColumn(name = "emisor_id")
+    private User emisor;
+
+    @ManyToOne
+    @JoinColumn(name = "receptor_id")
+    private User receptor;
+
+    @Column(columnDefinition = "TEXT")
     private String contenido;
-    private LocalDateTime fecha = LocalDateTime.now();
 
-    public Mensaje() {}
+    private LocalDateTime fechaEnvio;
 
-    // Getters y Setters
-    public Long getId() { return id; }
-    public String getEmisor() { return emisor; }
-    public void setEmisor(String emisor) { this.emisor = emisor; }
-    public String getReceptor() { return receptor; }
-    public void setReceptor(String receptor) { this.receptor = receptor; }
-    public String getContenido() { return contenido; }
-    public void setContenido(String contenido) { this.contenido = contenido; }
-    public LocalDateTime getFecha() { return fecha; }
+    public Mensaje() {
+        this.fechaEnvio = LocalDateTime.now();
+    }
 }

@@ -72,21 +72,22 @@
         }
 
         try {
-            // Buscamos en tu API de usuarios
-            const response = await fetch('/api/users');
-            const usuarios = await response.json();
+            // LLAMADA CORRECTA: Enviamos los datos al servidor para que él verifique
+            const response = await fetch('/api/users/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: email,
+                    passwordHash: pass // Asegúrate de que se llame igual que en Java
+                })
+            });
 
-            // Buscamos si existe el usuario con ese email y pass
-            const encontrado = usuarios.find(u => u.email === email && u.passwordHash === pass);
+            if (response.ok) {
+                const encontrado = await response.json();
 
-            if (encontrado) {
-                // 1. Guardamos el nombre para mostrarlo en el saludo
+                // Guardamos todo en el baúl del navegador (localStorage)
                 localStorage.setItem('usuarioNombre', encontrado.firstName);
-
-                // 2. ¡MUY IMPORTANTE! Guardamos el ID para poder subir la foto luego
                 localStorage.setItem('usuarioId', encontrado.id);
-
-                // 3. Guardamos también la foto actual (si ya tiene una)
                 localStorage.setItem('usuarioFoto', encontrado.fotoPerfil || '');
 
                 window.location.href = "home.html";
