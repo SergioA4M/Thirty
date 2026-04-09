@@ -22,33 +22,29 @@
         #displayBio:hover #iconEditBio { opacity: 1; }
         #iconEditBio { opacity: 0; transition: 0.2s; color: #3b5998; cursor: pointer; margin-left: 8px; font-size: 12px; }
 
-        /* --- ESTILOS SOBRE MÍ CON ICONOS Y TIMELINE --- */
+        /* Sobre Mí */
         .info-card { background: white; padding: 20px; border-radius: 12px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .info-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 2px solid #f0f2f5; }
         .info-header h5 { margin: 0; font-size: 16px; color: #1a1a1a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-
         .timeline-item { position: relative; padding-left: 45px; margin-bottom: 25px; }
         .timeline-item::before { content: ''; position: absolute; left: 17px; top: 35px; bottom: -20px; width: 2px; background: #eef2ff; }
         .timeline-item:last-child::before { display: none; }
-
-        .timeline-icon-container {
-            position: absolute; left: 0; top: 0; width: 34px; height: 34px;
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-            font-size: 14px; z-index: 2; border: 2px solid white;
-        }
+        .timeline-icon-container { position: absolute; left: 0; top: 0; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; z-index: 2; border: 2px solid white; }
         .icon-edu { background: #eef2ff; color: #3b5998; }
         .icon-work { background: #fff7ed; color: #ea580c; }
         .icon-life { background: #f0fdf4; color: #16a34a; }
-
         .info-label-tag { display: block; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
         .info-valor-modern { display: block; font-size: 13px; color: #333; line-height: 1.4; font-weight: 500; }
-
         #btnEditarInfo { transition: 0.2s; color: #999; cursor: pointer; padding: 5px; }
         #btnEditarInfo:hover { color: #3b5998; transform: rotate(15deg); }
 
         /* Modal */
         .modal-input { width: 92%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; }
         .btn-save { background: #3b5998; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+
+        /* Botón Subir Fotos */
+        .btn-subir-header { background: #4c66a4; color: white; border: 1px solid #2d4373; padding: 5px 10px; cursor: pointer; font-weight: bold; border-radius: 3px; transition: background 0.2s; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2); }
+        .btn-subir-header:hover { background: #5b74a8; }
     </style>
 </head>
 <body>
@@ -59,8 +55,12 @@
     <a href="perfil.html" class="nav-item nav-active">Perfil</a>
     <a href="#" class="nav-item">Mensajes</a>
     <a href="#" class="nav-item">Gente</a>
-    <div class="header-right" style="margin-left: auto; display: flex; gap: 15px;">
-        <a href="login.html" onclick="localStorage.clear()" style="color:white; text-decoration:none;">Salir</a>
+    <div class="header-right" style="margin-left: auto; display: flex; gap: 15px; align-items: center;">
+        <input type="file" id="inputSubirTodo" style="display:none" onchange="subirYCompartirFoto()">
+        <button onclick="document.getElementById('inputSubirTodo').click()" class="btn-subir-header">
+            <i class="fas fa-camera"></i> Subir fotos
+        </button>
+        <a href="login.html" onclick="localStorage.clear()" style="color:white; text-decoration:none; font-size:12px;">Salir</a>
     </div>
 </header>
 
@@ -75,35 +75,17 @@
                 <h5>Sobre mí</h5>
                 <i class="fas fa-pen-to-square" id="btnEditarInfo" onclick="abrirModalPerfil()"></i>
             </div>
-
             <div class="timeline-item">
-                <div class="timeline-icon-container icon-edu">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-                <div class="info-content">
-                    <span class="info-label-tag">Educación</span>
-                    <span id="perfilEstudios" class="info-valor-modern">---</span>
-                </div>
+                <div class="timeline-icon-container icon-edu"><i class="fas fa-graduation-cap"></i></div>
+                <div class="info-content"><span class="info-label-tag">Educación</span><span id="perfilEstudios" class="info-valor-modern">---</span></div>
             </div>
-
             <div class="timeline-item">
-                <div class="timeline-icon-container icon-work">
-                    <i class="fas fa-briefcase"></i>
-                </div>
-                <div class="info-content">
-                    <span class="info-label-tag">Trayectoria</span>
-                    <span id="perfilTrayectoria" class="info-valor-modern">---</span>
-                </div>
+                <div class="timeline-icon-container icon-work"><i class="fas fa-briefcase"></i></div>
+                <div class="info-content"><span class="info-label-tag">Trayectoria</span><span id="perfilTrayectoria" class="info-valor-modern">---</span></div>
             </div>
-
             <div class="timeline-item">
-                <div class="timeline-icon-container icon-life">
-                    <i class="fas fa-map-location-dot"></i>
-                </div>
-                <div class="info-content">
-                    <span class="info-label-tag">Life Style</span>
-                    <span id="perfilZonas" class="info-valor-modern">---</span>
-                </div>
+                <div class="timeline-icon-container icon-life"><i class="fas fa-map-location-dot"></i></div>
+                <div class="info-content"><span class="info-label-tag">Life Style</span><span id="perfilZonas" class="info-valor-modern">---</span></div>
             </div>
         </div>
     </div>
@@ -119,7 +101,7 @@
                 <i class="fas fa-pencil-alt" id="iconEditBio"></i>
             </div>
             <div id="editBioContainer" style="display: none; gap: 5px;">
-                <input type="text" id="inputBio" style="flex: 1; padding: 8px; border: 1px solid #3b5998; border-radius: 4px; outline: none;">
+                <input type="text" id="inputBio" style="flex: 1; padding: 8px; border: 1px solid #3b5998; border-radius: 4px;">
                 <button onclick="actualizarEstadoRapido()" style="background: #3b5998; color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 4px;">OK</button>
                 <button onclick="cancelarEdicionBio()" style="background: #ccc; border: none; padding: 5px 12px; cursor: pointer; border-radius: 4px;">X</button>
             </div>
@@ -130,7 +112,7 @@
                 Espacio Personal
                 <i class="fas fa-cog" id="btnEditarEspacio" onclick="cambiarEspacio()" style="cursor:pointer; color:#999; font-size: 12px;"></i>
             </h5>
-            <div id="contenedorEspacio" style="text-align: center; background: #000; line-height: 0; border-radius: 2px; overflow: hidden;">
+            <div id="contenedorEspacio" style="text-align: center; background: #000; border-radius: 2px; overflow: hidden;">
                 <div style="padding: 40px; color: white; font-size: 12px;">Vacío</div>
             </div>
         </div>
@@ -138,7 +120,7 @@
         <h4 style="border-bottom: 1px solid #ccc; padding-bottom: 5px; color: #666; font-size: 14px; letter-spacing: 1px;">TABLÓN</h4>
         <div id="tablon">
             <div class="card">
-                <textarea id="nuevoComentario" placeholder="Escribe algo en el tablón..." style="width:100%; border:1px solid #ddd; height: 50px; padding: 5px; font-family: inherit; resize: none;"></textarea>
+                <textarea id="nuevoComentario" placeholder="Escribe algo en el tablón..." style="width:100%; border:1px solid #ddd; height: 50px; padding: 5px; font-family: inherit; resize: none; box-sizing: border-box;"></textarea>
                 <div style="text-align: right; margin-top: 5px;">
                     <button onclick="publicarComentario()" style="background: #3b5998; color: white; border: none; padding: 6px 20px; cursor: pointer; font-weight: bold; border-radius: 2px;">Firmar</button>
                 </div>
@@ -163,18 +145,14 @@
     </div>
 </div>
 
-<div id="modalPerfil" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:25px; border:none; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index:100; border-radius: 12px; width: 320px;">
+<div id="modalPerfil" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); z-index:100; border-radius: 12px; width: 320px;">
     <h3 style="margin-top:0; color:#333;">Información Profesional</h3>
-
     <label class="info-label-tag">Educación</label>
-    <input type="text" id="editEstudios" class="modal-input" placeholder="Ej: Universidad Politécnica · 2024">
-
+    <input type="text" id="editEstudios" class="modal-input">
     <label class="info-label-tag">Experiencia</label>
-    <input type="text" id="editTrayectoria" class="modal-input" placeholder="Ej: Senior Designer en Acme Corp">
-
+    <input type="text" id="editTrayectoria" class="modal-input">
     <label class="info-label-tag">Ocio / Zonas</label>
-    <input type="text" id="editZonas" class="modal-input" placeholder="Ej: Madrid, Barrio de las Letras">
-
+    <input type="text" id="editZonas" class="modal-input">
     <div style="text-align: right; margin-top: 10px;">
         <button onclick="cerrarModalPerfil()" style="background:none; border:none; color:#888; cursor:pointer; margin-right: 15px;">Cancelar</button>
         <button onclick="guardarPerfil()" class="btn-save">Guardar cambios</button>
@@ -184,43 +162,177 @@
 <script>
     const params = new URLSearchParams(window.location.search);
     const miId = localStorage.getItem('usuarioId');
+    const miNombre = localStorage.getItem('usuarioNombre');
     let perfilId = params.get('id') || miId;
+
+    // --- 1. PARSEADOR DEFINITIVO (Soporta paréntesis, espacios y .avif) ---
+    function parsearContenido(texto) {
+        if (!texto) return "";
+        let contenido = texto;
+
+        // Detectar imágenes locales /uploads/ (incluso con nombres raros)
+        const imgLocalRegex = /\/uploads\/[^\s<>"]+/gi;
+        contenido = contenido.replace(imgLocalRegex, (match) => {
+            return `<img src="${match}" style="max-width:100%; border-radius:8px; margin-top:10px; display:block; border:1px solid #ddd;">`;
+        });
+
+        // YouTube
+        const ytRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/gi;
+        contenido = contenido.replace(ytRegex, '<div style="margin:10px 0; position:relative; padding-bottom:56.25%; height:0; overflow:hidden;"><iframe style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:8px;" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>');
+
+        return contenido;
+    }
 
     window.onload = async () => {
         if (!miId) { window.location.href = "login.html"; return; }
-        try {
-            const resp = await fetch(`/api/users/${perfilId}`);
-            if (resp.ok) {
-                const user = await resp.json();
-                document.getElementById('perfilNombreCompleto').innerText = user.firstName + " " + user.lastName;
-                document.getElementById('perfilBio').innerText = user.bio ? `"${user.bio}"` : "Sin estado";
-                document.getElementById('perfilEstudios').innerText = user.estudios || "Añadir formación...";
-                document.getElementById('perfilTrayectoria').innerText = user.trayectoria || "Añadir experiencia...";
-                document.getElementById('perfilZonas').innerText = user.zonasMarcha || "Añadir zonas...";
-                if (user.fotoPerfil) document.getElementById('perfilImg').src = "/uploads/" + user.fotoPerfil;
-                if (user.colegios) cargarEspacioPersonal(user.colegios);
-
-                if (perfilId !== miId) {
-                    document.getElementById('btnEditarInfo').style.display = 'none';
-                    document.getElementById('btnSubirFoto').style.display = 'none';
-                    document.getElementById('btnEditarEspacio').style.display = 'none';
-                    document.getElementById('iconEditBio').style.display = 'none';
-                    document.getElementById('displayBio').onclick = null;
-                    document.getElementById('displayBio').style.cursor = 'default';
-                }
-            }
-            cargarAlbum();
-            cargarComentarios();
-            cargarAmigos();
-        } catch (e) { console.error(e); }
+        await cargarDatosPerfil();
+        cargarAlbum();
+        cargarComentarios();
+        cargarAmigos();
     };
 
+    async function cargarDatosPerfil() {
+        const resp = await fetch(`/api/users/${perfilId}`);
+        if (resp.ok) {
+            const user = await resp.json();
+            document.getElementById('perfilNombreCompleto').innerText = user.firstName + " " + user.lastName;
+            document.getElementById('perfilBio').innerText = user.bio ? `"${user.bio}"` : "Sin estado";
+            document.getElementById('perfilEstudios').innerText = user.estudios || "---";
+            document.getElementById('perfilTrayectoria').innerText = user.trayectoria || "---";
+            document.getElementById('perfilZonas').innerText = user.zonasMarcha || "---";
+            if (user.fotoPerfil) document.getElementById('perfilImg').src = "/uploads/" + user.fotoPerfil;
+
+            if (perfilId !== miId) {
+                const elementosOcultar = ['btnEditarInfo', 'btnSubirFoto', 'btnEditarEspacio', 'iconEditBio', 'btnSubirHeader'];
+                elementosOcultar.forEach(id => { if(document.getElementById(id)) document.getElementById(id).style.display = 'none'; });
+            }
+        }
+    }
+
+    // --- 2. TABLÓN (Mezcla de comentarios y posts con fotos) ---
+    async function cargarComentarios() {
+        try {
+            const respCom = await fetch(`/api/comentarios/perfil/${perfilId}`);
+            const comentarios = await respCom.json();
+
+            const respPosts = await fetch('http://localhost:8080/api/posts');
+            const todosLosPosts = await respPosts.json();
+
+            // Filtramos posts del dueño del perfil (esto muestra sus fotos subidas)
+            const nombreDuenio = document.getElementById('perfilNombreCompleto').innerText.split(' ')[0];
+            const misPosts = todosLosPosts.filter(p => p.author === nombreDuenio);
+
+            let listaMix = [
+                ...comentarios.map(c => ({...c, tipo: 'comentario'})),
+                ...misPosts.map(p => ({...p, tipo: 'post'}))
+            ];
+
+            listaMix.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+            const div = document.getElementById('listaComentarios');
+            div.innerHTML = "";
+
+            listaMix.forEach(item => {
+                const esPost = item.tipo === 'post';
+                const autor = esPost ? item.author : item.autor.firstName;
+                const textoFinal = esPost ? parsearContenido(item.content) : item.contenido;
+                const avatar = esPost ? `https://ui-avatars.com/api/?name=${autor}&background=3b5998&color=fff` : (item.autor.fotoPerfil ? `/uploads/${item.autor.fotoPerfil}` : 'https://via.placeholder.com/40');
+
+                div.innerHTML += `
+                    <div class="card" style="display: flex; gap: 10px; padding: 10px; border-radius: 4px; ${esPost ? 'border-left: 4px solid #3b5998;' : ''}">
+                        <img src="${avatar}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 2px;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; color: #3b5998; font-size: 12px;">
+                                ${autor} ${esPost ? '<span style="color:#999; font-weight:normal;">(Actualización)</span>' : ''}
+                            </div>
+                            <div style="font-size: 13px; margin-top:3px;">${textoFinal}</div>
+                        </div>
+                    </div>`;
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    // --- 3. SUBIR Y COMPARTIR (Álbum + Tablón + Home) ---
+    async function subirYCompartirFoto() {
+        const fileInput = document.getElementById('inputSubirTodo');
+        if (!fileInput.files[0]) return;
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        try {
+            // A) Guardar en Álbum
+            const respFoto = await fetch(`/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
+            if (respFoto.ok) {
+                const data = await respFoto.json();
+                const nombreArchivo = data.url;
+                const rutaImagen = `/uploads/${nombreArchivo}`;
+
+                // B) Crear Post para Tablón y Home
+                await fetch('http://localhost:8080/api/posts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        author: miNombre,
+                        content: `Nueva foto en mi álbum: ${rutaImagen}`
+                    })
+                });
+
+                alert("¡Foto guardada y publicada!");
+                location.reload();
+            }
+        } catch (e) { alert("Error al procesar"); }
+    }
+
+    // --- 4. ÁLBUM (Cuadrícula de la derecha) ---
+    async function cargarAlbum() {
+        try {
+            const resp = await fetch(`/api/fotos/usuario/${perfilId}`);
+            if (resp.ok) {
+                const fotos = await resp.json();
+                const div = document.getElementById('cuadriculaFotos');
+                div.innerHTML = "";
+                // Mostramos las últimas 6 fotos
+                fotos.reverse().slice(0, 6).forEach(f => {
+                    div.innerHTML += `
+                        <div style="aspect-ratio: 1/1; overflow: hidden; border: 1px solid #ddd;">
+                            <img src="/uploads/${f.url}" style="width:100%; height:100%; object-fit:cover;">
+                        </div>`;
+                });
+            }
+        } catch (e) { }
+    }
+
+    // --- FUNCIONES EXTRA (Bio, Amigos, Modal) ---
+    async function cargarAmigos() {
+        const resp = await fetch('/api/users');
+        if (resp.ok) {
+            const usuarios = await resp.json();
+            const div = document.getElementById('listaAmigosPerfil');
+            div.innerHTML = "";
+            usuarios.filter(u => u.id != perfilId).slice(0, 9).forEach(u => {
+                const foto = u.fotoPerfil ? `/uploads/${u.fotoPerfil}` : 'https://via.placeholder.com/60';
+                div.innerHTML += `<a href="perfil.html?id=${u.id}" class="amigo-item"><img src="${foto}"><div>${u.firstName}</div></a>`;
+            });
+        }
+    }
+
+    async function publicarComentario() {
+        const texto = document.getElementById('nuevoComentario').value;
+        if (!texto.trim()) return;
+        await fetch(`/api/comentarios/${perfilId}/${miId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: texto
+        });
+        document.getElementById('nuevoComentario').value = "";
+        cargarComentarios();
+    }
+
     function habilitarEdicionBio() {
-        const textoActual = document.getElementById('perfilBio').innerText.replace(/"/g, "");
         document.getElementById('displayBio').style.display = 'none';
         document.getElementById('editBioContainer').style.display = 'flex';
-        document.getElementById('inputBio').value = textoActual;
-        document.getElementById('inputBio').focus();
+        document.getElementById('inputBio').value = document.getElementById('perfilBio').innerText.replace(/"/g, "");
     }
 
     function cancelarEdicionBio() {
@@ -230,189 +342,37 @@
 
     async function actualizarEstadoRapido() {
         const nuevoTexto = document.getElementById('inputBio').value;
-        const resp = await fetch(`/api/users/${miId}/perfil`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ bio: nuevoTexto })
+        const datos = {
+            bio: nuevoTexto,
+            estudios: document.getElementById('perfilEstudios').innerText,
+            trayectoria: document.getElementById('perfilTrayectoria').innerText,
+            zonasMarcha: document.getElementById('perfilZonas').innerText
+        };
+        await fetch(`/api/users/${miId}/perfil`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
         });
-        if (resp.ok) {
-            document.getElementById('perfilBio').innerText = `"${nuevoTexto}"`;
-            cancelarEdicionBio();
-        }
+        location.reload();
     }
+
+    function abrirModalPerfil() {
+        document.getElementById('editEstudios').value = document.getElementById('perfilEstudios').innerText;
+        document.getElementById('editTrayectoria').value = document.getElementById('perfilTrayectoria').innerText;
+        document.getElementById('editZonas').value = document.getElementById('perfilZonas').innerText;
+        document.getElementById('modalPerfil').style.display = 'block';
+    }
+    function cerrarModalPerfil() { document.getElementById('modalPerfil').style.display = 'none'; }
 
     async function guardarPerfil() {
         const datos = {
             estudios: document.getElementById('editEstudios').value,
             trayectoria: document.getElementById('editTrayectoria').value,
-            zonasMarcha: document.getElementById('editZonas').value
+            zonasMarcha: document.getElementById('editZonas').value,
+            bio: document.getElementById('perfilBio').innerText.replace(/"/g, "")
         };
-        const resp = await fetch(`/api/users/${miId}/perfil`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(datos)
-        });
-        if (resp.ok) location.reload();
+        await fetch(`/api/users/${miId}/perfil`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+        location.reload();
     }
-
-    async function cargarAmigos() {
-        try {
-            const resp = await fetch('/api/users');
-            if (resp.ok) {
-                const usuarios = await resp.json();
-                const div = document.getElementById('listaAmigosPerfil');
-                div.innerHTML = "";
-                const otros = usuarios.filter(u => u.id != perfilId).slice(0, 9);
-                otros.forEach(u => {
-                    const foto = u.fotoPerfil ? `/uploads/${u.fotoPerfil}` : 'https://via.placeholder.com/60';
-                    div.innerHTML += `
-                        <a href="perfil.html?id=${u.id}" class="amigo-item">
-                            <img src="${foto}">
-                            <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${u.firstName}</div>
-                        </a>`;
-                });
-            }
-        } catch (e) { console.error(e); }
-    }
-
-    async function cargarComentarios() {
-        try {
-            const resp = await fetch(`/api/comentarios/perfil/${perfilId}`);
-            if (resp.ok) {
-                const comentarios = await resp.json();
-                const div = document.getElementById('listaComentarios');
-                div.innerHTML = "";
-                comentarios.forEach(c => {
-                    const foto = c.autor.fotoPerfil ? `/uploads/${c.autor.fotoPerfil}` : 'https://via.placeholder.com/40';
-                    div.innerHTML += `
-                        <div class="card" style="display: flex; gap: 10px; padding: 10px; border-radius: 4px;">
-                            <img src="${foto}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 2px;">
-                            <div style="flex: 1;">
-                                <div style="font-weight: bold; color: #3b5998; font-size: 12px;">${c.autor.firstName}</div>
-                                <div style="font-size: 13px; color: #333;">${c.contenido}</div>
-                            </div>
-                        </div>`;
-                });
-            }
-        } catch (e) { console.error(e); }
-    }
-
-    async function publicarComentario() {
-        const texto = document.getElementById('nuevoComentario').value;
-        if (!texto.trim()) return;
-        const resp = await fetch(`/api/comentarios/${perfilId}/${miId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
-            body: texto
-        });
-        if (resp.ok) {
-            document.getElementById('nuevoComentario').value = "";
-            cargarComentarios();
-        }
-    }
-
-    async function cargarAlbum() {
-        try {
-            const resp = await fetch(`/api/fotos/usuario/${perfilId}`);
-            if (resp.ok) {
-                const fotos = await resp.json();
-                const div = document.getElementById('cuadriculaFotos');
-                div.innerHTML = "";
-                fotos.slice(-4).forEach(f => {
-                    const btnBorrar = (perfilId === miId) ? `<button onclick="confirmarBorrado(${f.id})" style="position:absolute; top:2px; right:2px; background:rgba(255,0,0,0.7); color:white; border:none; border-radius:50%; width:18px; height:18px; cursor:pointer; font-size:10px;">×</button>` : '';
-                    div.innerHTML += `<div style="position:relative;"><img src="/uploads/${f.url}" style="width:100%; height:80px; object-fit:cover; border:1px solid #ddd;">${btnBorrar}</div>`;
-                });
-            }
-        } catch (e) { console.error(e); }
-    }
-
-    async function subirAlAlbum() {
-        const file = document.getElementById('albumInput').files[0];
-        if(!file) return;
-        const formData = new FormData();
-        formData.append("file", file);
-        const resp = await fetch(`/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
-        if (resp.ok) { cargarAlbum(); }
-    }
-
-    async function confirmarBorrado(fotoId) {
-        if (confirm("¿Borrar foto?")) {
-            await fetch(`/api/fotos/${fotoId}`, { method: 'DELETE' });
-            cargarAlbum();
-        }
-    }
-
-    function generarEmbed(url) {
-        if (url.includes('youtube.com') || url.includes('youtu.be')) {
-            const videoId = url.split('v=')[1] || url.split('/').pop().split('?')[0];
-            return `<iframe width="100%" height="200" src="https://www.youtube.com/embed/${videoId}" frameborder="0"></iframe>`;
-        }
-        if (url.includes('spotify.com')) {
-            let sUrl = url.replace('/track/', '/embed/track/').split('?')[0];
-            return `<iframe src="${sUrl}" width="100%" height="80" frameborder="0" allow="encrypted-media"></iframe>`;
-        }
-        return null;
-    }
-
-    // --- CORRECCIÓN: CAMBIAR ESPACIO SIN BORRAR LO DEMÁS ---
-    async function cambiarEspacio() {
-        const url = prompt("Link de YouTube o Spotify:");
-        if (!url) return;
-
-        // Recopilamos todo lo que ya hay en el perfil para no perderlo
-        const datosActuales = {
-            bio: document.getElementById('perfilBio').innerText.replace(/"/g, ""),
-            estudios: document.getElementById('perfilEstudios').innerText,
-            trayectoria: document.getElementById('perfilTrayectoria').innerText,
-            zonasMarcha: document.getElementById('perfilZonas').innerText,
-            colegios: url // Actualizamos solo el link del video
-        };
-
-        const resp = await fetch(`/api/users/${miId}/perfil`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(datosActuales)
-        });
-
-        if (resp.ok) location.reload();
-    }
-
-    // --- CORRECCIÓN: ACTUALIZAR ESTADO SIN BORRAR LO PROFESIONAL ---
-    async function actualizarEstadoRapido() {
-        const nuevoTexto = document.getElementById('inputBio').value;
-
-        const datosActuales = {
-            bio: nuevoTexto, // El nuevo estado
-            estudios: document.getElementById('perfilEstudios').innerText,
-            trayectoria: document.getElementById('perfilTrayectoria').innerText,
-            zonasMarcha: document.getElementById('perfilZonas').innerText
-            // Nota: Si el video/música se guarda en 'colegios', deberías obtenerlo de una variable global o del user cargado
-        };
-
-        const resp = await fetch(`/api/users/${miId}/perfil`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(datosActuales)
-        });
-
-        if (resp.ok) {
-            document.getElementById('perfilBio').innerText = `"${nuevoTexto}"`;
-            cancelarEdicionBio();
-        }
-    }
-
-    function cargarEspacioPersonal(url) {
-        const embed = generarEmbed(url);
-        if (embed) document.getElementById('contenedorEspacio').innerHTML = embed;
-    }
-
-    function abrirModalPerfil() {
-        document.getElementById('editEstudios').value = document.getElementById('perfilEstudios').innerText === "Añadir formación..." ? "" : document.getElementById('perfilEstudios').innerText;
-        document.getElementById('editTrayectoria').value = document.getElementById('perfilTrayectoria').innerText === "Añadir experiencia..." ? "" : document.getElementById('perfilTrayectoria').innerText;
-        document.getElementById('editZonas').value = document.getElementById('perfilZonas').innerText === "Añadir zonas..." ? "" : document.getElementById('perfilZonas').innerText;
-        document.getElementById('modalPerfil').style.display = 'block';
-    }
-    function cerrarModalPerfil() { document.getElementById('modalPerfil').style.display = 'none'; }
 </script>
 </body>
 </html>
