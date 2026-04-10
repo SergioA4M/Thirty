@@ -23,4 +23,7 @@ public class Comentario {
     @ManyToOne
     @JoinColumn(name = "perfil_id")
     private User perfil; // El dueño del muro
+
+    // AÑADE ESTO para que la notificación funcione de verdad
+    private boolean leido = false;
 }

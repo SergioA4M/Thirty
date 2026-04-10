@@ -10,4 +10,5 @@ public interface MensajeRepository extends JpaRepository<Mensaje, Long> {
     // Esta consulta busca la conversación entre dos usuarios (en ambos sentidos)
     @Query("SELECT m FROM Mensaje m WHERE (m.emisor.id = ?1 AND m.receptor.id = ?2) OR (m.emisor.id = ?2 AND m.receptor.id = ?1) ORDER BY m.fechaEnvio ASC")
     List<Mensaje> buscarConversacion(Long id1, Long id2);
+    long countByReceptorIdAndLeidoFalse(Long receptorId);
 }

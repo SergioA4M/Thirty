@@ -74,6 +74,32 @@
             </div>
             <h4 id="userName" style="margin:5px 0 0 0; text-align:center;">Usuario</h4>
         </div>
+        <div class="card" id="seccion-notificaciones" style="padding: 10px; line-height: 1.8;">
+            <div class="notif-item">
+                <a href="#" style="text-decoration:none; color:#5d7d2d; font-size:12px; font-weight:bold;">
+                    <i class="fas fa-comment-alt" style="margin-right:5px;"></i>
+                    <span id="count-mensajes">0</span> mensajes privados
+                </a>
+            </div>
+            <div class="notif-item">
+                <a href="#" style="text-decoration:none; color:#5d7d2d; font-size:12px; font-weight:bold;">
+                    <i class="fas fa-user-plus" style="margin-right:5px;"></i>
+                    <span id="count-amigos">0</span> solicitudes de amistad
+                </a>
+            </div>
+            <div class="notif-item">
+                <a href="#" style="text-decoration:none; color:#5d7d2d; font-size:12px; font-weight:bold;">
+                    <i class="fas fa-tag" style="margin-right:5px;"></i>
+                    <span id="count-etiquetas">0</span> etiquetas en fotos
+                </a>
+            </div>
+            <div class="notif-item">
+                <a href="#" style="text-decoration:none; color:#5d7d2d; font-size:12px; font-weight:bold;">
+                    <i class="fas fa-comment-dots" style="margin-right:5px;"></i>
+                    <span id="count-comentarios">0</span> comentarios nuevos
+                </a>
+            </div>
+        </div>
 
         <div class="card">
             <h5>Mis Redes</h5>
@@ -329,6 +355,63 @@
         if (confirm("¿Borrar?")) { await fetch(`http://localhost:8080/api/posts/${id}`, { method: 'DELETE' }); cargarPosts(); }
     }
     window.borrarPost = borrarPost; window.abrirChat = abrirChat; window.enviarMensajeChat = enviarMensajeChat;
+    async function actualizarNotificaciones() {
+        const miId = localStorage.getItem('usuarioId');
+        if (!miId) return;
+
+        try {
+            // Aquí pediremos al backend el conteo de todo
+            // Suponiendo que creamos un endpoint que nos de un resumen: /api/notificaciones/resumen/{id}
+            const resp = await fetch(`/api/notificaciones/resumen/${miId}`);
+
+            if (resp.ok) {
+                const data = await resp.json();
+
+                // Actualizamos los números en el HTML
+                document.getElementById('count-mensajes').innerText = data.mensajesNuevos || 0;
+                document.getElementById('count-amigos').innerText = data.solicitudesAmistad || 0;
+                document.getElementById('count-etiquetas').innerText = data.etiquetasNuevas || 0;
+                document.getElementById('count-comentarios').innerText = data.comentariosNuevos || 0;
+
+                // TRUCO VISUAL: Si el número es 0, podemos poner el texto en gris,
+                // y si es > 0, en el verde de Tuenti.
+                const links = document.querySelectorAll('.notif-item a');
+                links.forEach(link => {
+                    const count = parseInt(link.querySelector('span').innerText);
+                    link.style.color = count > 0 ? "#5d7d2d" : "#999";
+                });
+            }
+        } catch (e) {
+            console.warn("Todavía no tienes el endpoint de notificaciones listo.");
+        }
+    }
+    async function cargarNotificacionesTuenti() {
+        const miId = localStorage.getItem('usuarioId');
+        try {
+            const resp = await fetch(`/api/notificaciones/resumen/${miId}`);
+            const data = await resp.json();
+
+            const lista = document.getElementById('seccion-notificaciones'); // El div que creamos antes
+            lista.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <a href="#" style="color: #5d7d2d; text-decoration: none; font-size: 11px;">
+                        <i class="fas fa-envelope"></i> <b>${data.mensajes}</b> mensajes privados
+                    </a>
+                    <a href="#" style="color: #5d7d2d; text-decoration: none; font-size: 11px;">
+                        <i class="fas fa-comment"></i> <b>${data.comentarios}</b> comentarios en tablón
+                    </a>
+                    <a href="#" style="color: #5d7d2d; text-decoration: none; font-size: 11px;">
+                        <i class="fas fa-image"></i> <b>${data.fotos}</b> fotos en tu álbum
+                    </a>
+                </div>
+            `;
+        } catch (e) { console.log("Error en notificaciones"); }
+    }
+
+    // Ejecutar al cargar
+    actualizarNotificaciones();
+    // Refrescar cada 30 segundos para que parezca "en vivo"
+    setInterval(actualizarNotificaciones, 30000);
 </script>
 </body>
 </html>

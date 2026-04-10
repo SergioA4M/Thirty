@@ -26,6 +26,9 @@ public class Mensaje {
 
     private LocalDateTime fechaEnvio;
 
+    // AÑADE ESTA LÍNEA:
+    private boolean leido = false;
+
     public Mensaje() {
         this.fechaEnvio = LocalDateTime.now();
     }

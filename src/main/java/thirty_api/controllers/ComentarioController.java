@@ -26,11 +26,25 @@ public class ComentarioController {
         c.setContenido(texto);
         c.setPerfil(perfil);
         c.setAutor(autor);
+        c.setLeido(false); // <--- IMPORTANTE: Nace como notificación pendiente
         return comentarioRepository.save(c);
     }
 
     @GetMapping("/perfil/{perfilId}")
     public List<Comentario> getComentarios(@PathVariable Long perfilId) {
-        return comentarioRepository.findByPerfilIdOrderByFechaDesc(perfilId);
+        // --- EXTRA: LIMPIAR NOTIFICACIONES ---
+        // Cuando alguien pide los comentarios de SU PROPIO perfil, los marcamos como leídos
+        List<Comentario> lista = comentarioRepository.findByPerfilIdOrderByFechaDesc(perfilId);
+
+        // Si quieres que solo se marquen como leídos cuando el DUEÑO los ve,
+        // podrías añadir una lógica aquí, pero por ahora vamos a marcarlos todos:
+        lista.forEach(com -> {
+            if(!com.isLeido()){
+                com.setLeido(true);
+                comentarioRepository.save(com);
+            }
+        });
+
+        return lista;
     }
 }
