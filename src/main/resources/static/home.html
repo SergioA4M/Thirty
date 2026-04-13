@@ -114,16 +114,12 @@
 
     <div class="right-col">
         <div class="card" style="padding:0; height: 500px; display: flex; flex-direction: column;">
-            <div id="chat-header" style="background: #f6f7f9; padding: 10px; border-bottom: 1px solid #bdc3c7; font-weight: bold; font-size: 13px; color: #3b5998;">
-                Chat
-            </div>
+            <div id="chat-header" style="background: #f6f7f9; padding: 10px; border-bottom: 1px solid #bdc3c7; font-weight: bold; font-size: 13px; color: #3b5998;"> Chat </div>
             <div id="chat-window" style="flex:1; padding:10px; font-size:13px; overflow-y: auto; background: #f0f2f5;"></div>
             <div id="chat-input-area" style="padding: 10px; border-top: 1px solid #bdc3c7; display:none;">
                 <div style="display:flex; gap:5px;">
                     <input type="text" id="mensajeTexto" style="flex:1; border:1px solid #ccc; border-radius:15px; padding:5px;">
-                    <button onclick="enviarMensajeChat()" style="background:#3b5998; color:white; border:none; border-radius:50%; width:30px; height:30px;">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                    <button onclick="enviarMensajeChat()" style="background:#3b5998; color:white; border:none; border-radius:50%; width:30px; height:30px;"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
@@ -163,18 +159,21 @@
         const foto = localStorage.getItem('usuarioFoto');
         const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
 
-        // HE QUITADO EL REBOTE AL LOGIN. Si no hay ID, simplemente no cargará los datos, pero te dejará ver la página.
+        // NO HAY REDIRECCIÓN. Te deja entrar aunque no haya sesión para que no te bloquees.
         if (nombre) document.getElementById('userName').innerText = nombre;
-        if (foto && foto !== 'null') {
-            document.getElementById('userImg').src = `${BASE_URL}/uploads/${foto}`;
+
+        const imgEl = document.getElementById('userImg');
+        if (foto && foto !== 'null' && foto !== '') {
+            imgEl.src = `${BASE_URL}/uploads/${foto}`;
         } else if (nombre) {
-            document.getElementById('userImg').src = `https://ui-avatars.com/api/?name=${nombre}&background=3b5998&color=fff`;
+            imgEl.src = `https://ui-avatars.com/api/?name=${nombre}&background=3b5998&color=fff`;
         }
 
         cargarPosts();
-        if (miId) {
+        if (miId && miId !== 'undefined') {
             cargarAmigosSidebar();
-            actualizarNotificaciones();
+            // Solo llamamos a notificaciones si la ruta existe
+            actualizarNotificaciones().catch(e => console.log("Notificaciones no listas"));
         }
     });
 
@@ -194,11 +193,12 @@
 
     async function publicarMensaje() {
         const t = document.getElementById('textoPost');
+        const nombre = localStorage.getItem('usuarioNombre') || 'Anónimo';
         if(!t.value.trim()) return;
         await fetch(`${BASE_URL}/api/posts`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({author: localStorage.getItem('usuarioNombre') || 'Anonimo', content: t.value})
+            body: JSON.stringify({author: nombre, content: t.value})
         });
         t.value = "";
         cargarPosts();
@@ -244,6 +244,7 @@
         const f = document.getElementById('inputFoto');
         const id = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
         if(!f.files[0]) return;
+        if (f.files[0].size > 1024 * 1024) { alert("Imagen demasiado grande (máx 1MB)"); return; }
         const fd = new FormData(); fd.append("file", f.files[0]);
         const r = await fetch(`${BASE_URL}/api/fotos/upload/${id}`, {method: 'POST', body: fd});
         if(r.ok) { const d = await r.json(); localStorage.setItem('usuarioFoto', d.url); location.reload(); }
@@ -272,12 +273,12 @@
 
     async function actualizarNotificaciones() {
         const id = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
-        try {
-            const r = await fetch(`${BASE_URL}/api/notificaciones/resumen/${id}`);
+        const r = await fetch(`${BASE_URL}/api/notificaciones/resumen/${id}`);
+        if(r.ok) {
             const d = await r.json();
             document.getElementById('count-mensajes').innerText = d.mensajesNuevos || 0;
             document.getElementById('count-amigos').innerText = d.solicitudesAmistad || 0;
-        } catch(e){}
+        }
     }
 
     setInterval(() => { if(receptorIdActual) actualizarMensajes(); }, 3000);
