@@ -12,14 +12,12 @@
         .card { background: white; padding: 15px; border: 1px solid #bdc3c7; margin-bottom: 15px; border-radius: 2px; }
         h5 { margin-top:0; border-bottom: 1px solid #eee; padding-bottom: 5px; color: #3b5998; }
 
-        /* --- REDES SOCIALES MEJORADAS --- */
         .social-links { list-style: none; padding: 0; }
         .social-links li { margin-bottom: 12px; display: flex; align-items: center; font-size: 14px; }
         .social-links a { text-decoration: none; color: #333; display: flex; align-items: center; width: 100%; transition: color 0.2s; }
         .social-links i { margin-right: 10px; width: 20px; text-align: center; font-size: 18px; color: #666; transition: transform 0.2s; }
         .social-links a:hover { color: #3b5998; }
         .social-links a:hover i { transform: scale(1.2); color: #3b5998; }
-        .social-links a:hover .fa-github { color: #333; }
 
         .center-col .status-box { background: white; padding: 15px; border: 1px solid #bdc3c7; margin-bottom: 20px; position: relative; }
         .status-box textarea { width: 100%; border: 1px solid #ccc; padding: 10px; box-sizing: border-box; resize: none; border-radius: 4px; }
@@ -37,10 +35,7 @@
         #emoji-picker-container { position: absolute; z-index: 999; top: 100%; left: 0; display: none; margin-top: 5px; }
         .twitter-tweet { margin: 10px 0 !important; }
 
-        /* Estilo Botón Cámara */
-        .btn-subir-header {
-            background: #4c66a4; color: white; border: 1px solid #2d4373; padding: 5px 10px; cursor: pointer; font-weight: bold; border-radius: 3px; font-size: 11px; display: flex; align-items: center; gap: 5px; margin-left: 10px;
-        }
+        .btn-subir-header { background: #4c66a4; color: white; border: 1px solid #2d4373; padding: 5px 10px; cursor: pointer; font-weight: bold; border-radius: 3px; font-size: 11px; display: flex; align-items: center; gap: 5px; margin-left: 10px; }
         .btn-subir-header:hover { background: #5b74a8; }
     </style>
 </head>
@@ -87,28 +82,13 @@
                     <span id="count-amigos">0</span> solicitudes de amistad
                 </a>
             </div>
-            <div class="notif-item">
-                <a href="#" style="text-decoration:none; color:#5d7d2d; font-size:12px; font-weight:bold;">
-                    <i class="fas fa-tag" style="margin-right:5px;"></i>
-                    <span id="count-etiquetas">0</span> etiquetas en fotos
-                </a>
-            </div>
-            <div class="notif-item">
-                <a href="#" style="text-decoration:none; color:#5d7d2d; font-size:12px; font-weight:bold;">
-                    <i class="fas fa-comment-dots" style="margin-right:5px;"></i>
-                    <span id="count-comentarios">0</span> comentarios nuevos
-                </a>
-            </div>
         </div>
 
         <div class="card">
             <h5>Mis Redes</h5>
             <ul class="social-links">
                 <li><a href="https://github.com/" target="_blank"><i class="fab fa-github"></i> GitHub</a></li>
-                <li><a href="https://linkedin.com/in/" target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
                 <li><a href="https://instagram.com/" target="_blank"><i class="fab fa-instagram"></i> Instagram</a></li>
-                <li><a href="https://x.com/" target="_blank"><i class="fa-brands fa-x-twitter"></i> X (Twitter)</a></li>
-                <li><a href="https://tiktok.com/" target="_blank"><i class="fab fa-tiktok"></i> TikTok</a></li>
             </ul>
         </div>
 
@@ -171,59 +151,38 @@
 </script>
 
 <script>
-    // --- TU LÓGICA ORIGINAL ---
+    // --- CORRECCIÓN CLAVE: URL DE RENDER ---
+    const BASE_URL = 'https://thirty-poqp.onrender.com';
+
     function parsearContenido(texto) {
         if (!texto) return "";
-
         let contenido = texto;
-
-        // 1. FOTOS DE TUENTI (Rutas locales /uploads/)
-        // Esta nueva regex captura TODO desde /uploads/ hasta el final de la línea o un espacio
         const imgLocalRegex = /\/uploads\/[^\s<>"]+/gi;
         contenido = contenido.replace(imgLocalRegex, (match) => {
-            return `<img src="${match}" style="max-width:100%; border-radius:8px; margin-top:10px; display:block; border:1px solid #ddd;">`;
+            return `<img src="${BASE_URL}${match}" style="max-width:100%; border-radius:8px; margin-top:10px; display:block; border:1px solid #ddd;">`;
         });
-
-        // 2. YOUTUBE
         const ytRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/gi;
         contenido = contenido.replace(ytRegex, '<div style="margin:10px 0; position:relative; padding-bottom:56.25%; height:0; overflow:hidden;"><iframe style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:8px;" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>');
-
-        // 3. TWITTER / X
-        const twitterRegex = /(https?:\/\/(?:www\.)?(?:twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/(\d+))/gi;
-        if (twitterRegex.test(contenido)) {
-            contenido = contenido.replace(twitterRegex, (url) => {
-                const baseUrl = url.split('?')[0].replace('x.com', 'twitter.com');
-                return `<div style="margin:15px 0;"><blockquote class="twitter-tweet" data-conversation="none" data-theme="light"><a href="${baseUrl}"></a></blockquote></div>`;
-            });
-        }
-
-        // 4. IMÁGENES EXTERNAS (Solo si no son de /uploads/)
-        const imgExtRegex = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp|avif))/gi;
-        contenido = contenido.replace(imgExtRegex, (url) => {
-            if (url.includes('twimg.com') || url.includes('twitter.com') || url.includes('/uploads/')) return url;
-            return `<img src="${url}" style="max-width:100%; border-radius:8px; margin-top:10px; display:block;">`;
-        });
-
         return contenido;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         const nombre = localStorage.getItem('usuarioNombre');
         const foto = localStorage.getItem('usuarioFoto');
+        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId'); // Doble comprobación
+
+        if (!miId) { window.location.href = "login.html"; return; }
+
         if (nombre) document.getElementById('userName').innerText = nombre;
-        if (foto && foto !== 'null') document.getElementById('userImg').src = '/uploads/' + foto;
+        if (foto && foto !== 'null') document.getElementById('userImg').src = BASE_URL + '/uploads/' + foto;
         cargarPosts();
         cargarAmigosSidebar();
-
-        const inputChat = document.getElementById('mensajeTexto');
-        if (inputChat) {
-            inputChat.addEventListener('keypress', (e) => { if (e.key === 'Enter') enviarMensajeChat(); });
-        }
+        actualizarNotificaciones();
     });
 
     async function cargarPosts() {
         try {
-            const response = await fetch('http://localhost:8080/api/posts');
+            const response = await fetch(`${BASE_URL}/api/posts`);
             const posts = await response.json();
             const muro = document.getElementById('muro');
             const miNombre = localStorage.getItem('usuarioNombre');
@@ -234,116 +193,64 @@
                 const fecha = new Date(post.createdAt).toLocaleString();
                 const contenidoParsed = parsearContenido(post.content);
                 const avatarUrl = (post.author === miNombre && miFoto && miFoto !== 'null')
-                    ? '/uploads/' + miFoto
+                    ? BASE_URL + '/uploads/' + miFoto
                     : `https://ui-avatars.com/api/?name=${post.author}&background=3b5998&color=fff`;
                 const botonBorrar = (post.author === miNombre)
-                    ? `<i class="fas fa-trash-alt" onclick="borrarPost(${post.id})" style="cursor:pointer; color:#ccc; font-size:12px; float:right;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#ccc'"></i>`
+                    ? `<i class="fas fa-trash-alt" onclick="borrarPost(${post.id})" style="cursor:pointer; color:#ccc; font-size:12px; float:right;"></i>`
                     : "";
-                muro.innerHTML += `<div class="post" id="post-${post.id}"><img src="${avatarUrl}" class="avatar"><div class="post-content"><div class="post-header">${botonBorrar}<span style="color:#3b5998; font-weight:bold;">${post.author}</span></div><div style="white-space: pre-wrap; font-size:14px; margin-top:5px;">${contenidoParsed}</div><div class="post-time">${fecha}</div></div></div>`;
+                muro.innerHTML += `<div class="post" id="post-${post.id}"><img src="${avatarUrl}" class="avatar"><div class="post-content"><div class="post-header">${botonBorrar}<span>${post.author}</span></div><div style="font-size:14px; margin-top:5px;">${contenidoParsed}</div><div class="post-time">${fecha}</div></div></div>`;
             });
-            if (window.twttr && window.twttr.widgets) window.twttr.widgets.load();
         } catch (e) { console.error("Error posts"); }
     }
 
-    // --- FUNCIONES DE CHAT RECUPERADAS ---
     let receptorIdActual = null;
     async function cargarAmigosSidebar() {
-        const miId = localStorage.getItem('usuarioId');
-        const contenedor = document.getElementById('lista-contactos');
+        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
         try {
-            const response = await fetch(`http://localhost:8080/api/users/${miId}/amigos`);
+            const response = await fetch(`${BASE_URL}/api/users/${miId}/amigos`);
             const amigos = await response.json();
+            const contenedor = document.getElementById('lista-contactos');
             contenedor.innerHTML = amigos.length ? "" : "<p style='color:gray; font-size:12px;'>Sin amigos.</p>";
             amigos.forEach(amigo => {
-                contenedor.innerHTML += `<div onclick="abrirChat('${amigo.id}', '${amigo.firstName}')" style="display:flex; align-items:center; gap:10px; margin-bottom:12px; cursor:pointer;"><div style="width:8px; height:8px; background:#2ecc71; border-radius:50%;"></div><span style="font-size:14px; font-weight:500;">${amigo.firstName} ${amigo.lastName}</span></div>`;
+                contenedor.innerHTML += `<div onclick="abrirChat('${amigo.id}', '${amigo.firstName}')" style="display:flex; align-items:center; gap:10px; margin-bottom:12px; cursor:pointer;"><div style="width:8px; height:8px; background:#2ecc71; border-radius:50%;"></div><span style="font-size:14px;">${amigo.firstName} ${amigo.lastName}</span></div>`;
             });
         } catch (e) { }
     }
+
     async function abrirChat(id, nombre) {
         receptorIdActual = id;
         document.getElementById('chat-header').innerText = "Chat con " + nombre;
         document.getElementById('chat-input-area').style.display = 'block';
         actualizarMensajes();
     }
+
     async function actualizarMensajes() {
         if (!receptorIdActual) return;
-        const miId = localStorage.getItem('usuarioId');
-        const response = await fetch(`http://localhost:8080/api/mensajes/historial/${miId}/${receptorIdActual}`);
-        const mensajes = await response.json();
-        const win = document.getElementById('chat-window');
-        win.innerHTML = "";
-        mensajes.forEach(m => {
-            const soyYo = m.emisor.id == miId;
-            win.innerHTML += `<div style="text-align:${soyYo?'right':'left'}; margin-bottom:10px;"><span style="background:${soyYo?'#dcf8c6':'white'}; padding:6px 10px; border-radius:8px; display:inline-block; max-width:80%; shadow:0 1px 1px rgba(0,0,0,0.1);">${m.contenido}</span></div>`;
-        });
-        win.scrollTop = win.scrollHeight;
+        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
+        try {
+            const response = await fetch(`${BASE_URL}/api/mensajes/historial/${miId}/${receptorIdActual}`);
+            const mensajes = await response.json();
+            const win = document.getElementById('chat-window');
+            win.innerHTML = mensajes.map(m => {
+                const soyYo = m.emisor.id == miId;
+                return `<div style="text-align:${soyYo?'right':'left'}; margin-bottom:10px;"><span style="background:${soyYo?'#dcf8c6':'white'}; padding:6px 10px; border-radius:8px; display:inline-block; max-width:80%;">${m.contenido}</span></div>`;
+            }).join('');
+            win.scrollTop = win.scrollHeight;
+        } catch(e){}
     }
+
     async function enviarMensajeChat() {
         const input = document.getElementById('mensajeTexto');
-        const texto = input.value.trim();
-        if (!texto || !receptorIdActual) return;
-        const res = await fetch(`http://localhost:8080/api/mensajes/enviar?emisorId=${localStorage.getItem('usuarioId')}&receptorId=${receptorIdActual}`, { method: 'POST', body: texto });
+        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
+        if (!input.value.trim() || !receptorIdActual) return;
+        const res = await fetch(`${BASE_URL}/api/mensajes/enviar?emisorId=${miId}&receptorId=${receptorIdActual}`, { method: 'POST', body: input.value });
         if (res.ok) { input.value = ""; actualizarMensajes(); }
-    }
-    setInterval(() => { if (receptorIdActual) actualizarMensajes(); }, 3000);
-
-    // --- ACCIÓN TUENTI ---
-    async function subirYCompartirFoto() {
-        const fileInput = document.getElementById('inputSubirTodo');
-        const miId = localStorage.getItem('usuarioId');
-        const miNombre = localStorage.getItem('usuarioNombre');
-
-        if (!fileInput.files[0] || !miId) return;
-
-        const formData = new FormData();
-        formData.append("file", fileInput.files[0]);
-
-        try {
-            const respFoto = await fetch(`/api/fotos/upload/${miId}`, {
-                method: 'POST',
-                body: formData
-            });
-
-            if (respFoto.ok) {
-                // 1. LEEMOS LA RESPUESTA COMO JSON
-                const data = await respFoto.json();
-                console.log("Datos recibidos del servidor:", data);
-
-                // 2. EXTRAEMOS LA URL (que según tu mensaje es: data.url)
-                if (data && data.url) {
-                    const nombreArchivo = data.url;
-                    const rutaImagen = `/uploads/${nombreArchivo}`;
-
-                    // 3. CREAMOS EL POST (Para Álbum, Home y Perfil)
-                    const respPost = await fetch('http://localhost:8080/api/posts', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            author: miNombre,
-                            content: `He subido una nueva foto: ${rutaImagen}`
-                        })
-                    });
-
-                    if (respPost.ok) {
-                        alert("¡Foto publicada con éxito!");
-                        location.reload(); // Refresca para que todo aparezca en su sitio
-                    }
-                } else {
-                    alert("Error: El servidor no devolvió la URL de la imagen.");
-                }
-            } else {
-                alert("Error al subir el archivo.");
-            }
-        } catch (e) {
-            console.error("Error en el proceso:", e);
-            alert("Error de conexión con el servidor.");
-        }
     }
 
     async function publicarMensaje() {
         const el = document.getElementById('textoPost');
         if (!el.value.trim()) return;
-        await fetch('http://localhost:8080/api/posts', {
+        await fetch(`${BASE_URL}/api/posts`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ author: localStorage.getItem('usuarioNombre'), content: el.value })
@@ -351,67 +258,46 @@
         el.value = "";
         cargarPosts();
     }
-    async function borrarPost(id) {
-        if (confirm("¿Borrar?")) { await fetch(`http://localhost:8080/api/posts/${id}`, { method: 'DELETE' }); cargarPosts(); }
-    }
-    window.borrarPost = borrarPost; window.abrirChat = abrirChat; window.enviarMensajeChat = enviarMensajeChat;
-    async function actualizarNotificaciones() {
-        const miId = localStorage.getItem('usuarioId');
-        if (!miId) return;
 
+    async function subirYCompartirFoto() {
+        const fileInput = document.getElementById('inputSubirTodo');
+        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
+        const miNombre = localStorage.getItem('usuarioNombre');
+        if (!fileInput.files[0]) return;
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
         try {
-            // Aquí pediremos al backend el conteo de todo
-            // Suponiendo que creamos un endpoint que nos de un resumen: /api/notificaciones/resumen/{id}
-            const resp = await fetch(`/api/notificaciones/resumen/${miId}`);
+            const respFoto = await fetch(`${BASE_URL}/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
+            if (respFoto.ok) {
+                const data = await respFoto.json();
+                await fetch(`${BASE_URL}/api/posts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ author: miNombre, content: `He subido una nueva foto: /uploads/${data.url}` })
+                });
+                location.reload();
+            }
+        } catch (e) { alert("Error"); }
+    }
 
+    async function borrarPost(id) {
+        if (confirm("¿Borrar?")) { await fetch(`${BASE_URL}/api/posts/${id}`, { method: 'DELETE' }); cargarPosts(); }
+    }
+
+    async function actualizarNotificaciones() {
+        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
+        try {
+            const resp = await fetch(`${BASE_URL}/api/notificaciones/resumen/${miId}`);
             if (resp.ok) {
                 const data = await resp.json();
-
-                // Actualizamos los números en el HTML
                 document.getElementById('count-mensajes').innerText = data.mensajesNuevos || 0;
                 document.getElementById('count-amigos').innerText = data.solicitudesAmistad || 0;
-                document.getElementById('count-etiquetas').innerText = data.etiquetasNuevas || 0;
-                document.getElementById('count-comentarios').innerText = data.comentariosNuevos || 0;
-
-                // TRUCO VISUAL: Si el número es 0, podemos poner el texto en gris,
-                // y si es > 0, en el verde de Tuenti.
-                const links = document.querySelectorAll('.notif-item a');
-                links.forEach(link => {
-                    const count = parseInt(link.querySelector('span').innerText);
-                    link.style.color = count > 0 ? "#5d7d2d" : "#999";
-                });
             }
-        } catch (e) {
-            console.warn("Todavía no tienes el endpoint de notificaciones listo.");
-        }
-    }
-    async function cargarNotificacionesTuenti() {
-        const miId = localStorage.getItem('usuarioId');
-        try {
-            const resp = await fetch(`/api/notificaciones/resumen/${miId}`);
-            const data = await resp.json();
-
-            const lista = document.getElementById('seccion-notificaciones'); // El div que creamos antes
-            lista.innerHTML = `
-                <div style="display: flex; flex-direction: column; gap: 5px;">
-                    <a href="#" style="color: #5d7d2d; text-decoration: none; font-size: 11px;">
-                        <i class="fas fa-envelope"></i> <b>${data.mensajes}</b> mensajes privados
-                    </a>
-                    <a href="#" style="color: #5d7d2d; text-decoration: none; font-size: 11px;">
-                        <i class="fas fa-comment"></i> <b>${data.comentarios}</b> comentarios en tablón
-                    </a>
-                    <a href="#" style="color: #5d7d2d; text-decoration: none; font-size: 11px;">
-                        <i class="fas fa-image"></i> <b>${data.fotos}</b> fotos en tu álbum
-                    </a>
-                </div>
-            `;
-        } catch (e) { console.log("Error en notificaciones"); }
+        } catch (e) { }
     }
 
-    // Ejecutar al cargar
-    actualizarNotificaciones();
-    // Refrescar cada 30 segundos para que parezca "en vivo"
-    setInterval(actualizarNotificaciones, 30000);
+    setInterval(() => { if (receptorIdActual) actualizarMensajes(); }, 3000);
+    window.borrarPost = borrarPost; window.abrirChat = abrirChat; window.enviarMensajeChat = enviarMensajeChat;
 </script>
 </body>
 </html>
