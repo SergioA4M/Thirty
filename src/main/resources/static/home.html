@@ -60,7 +60,7 @@
 <div class="main-grid">
     <div class="left-col">
         <div class="card">
-            <input type="file" id="inputFoto" style="display: none;" accept="image/*" onchange="subirFoto()">
+            <input type="file" id="inputFoto" style="display: none;" accept="image/*" onchange="subirFotoManual()">
             <div class="profile-container" onclick="document.getElementById('inputFoto').click()" style="text-align:center; cursor:pointer;">
                 <img id="userImg" src="https://via.placeholder.com/100" style="width: 100px; height: 100px; object-fit: cover; border-radius: 2px;">
                 <div style="font-size: 10px; color: #3b5998; margin-top: 2px;">Cambiar foto</div>
@@ -71,14 +71,14 @@
         <div class="card" id="seccion-notificaciones" style="padding: 10px; line-height: 1.8;">
             <h5 style="margin-bottom: 10px;">Notificaciones</h5>
             <div class="notif-item">
-                <a href="#" style="text-decoration:none; color:#999; font-size:12px; font-weight:bold;">
-                    <i class="fas fa-comment-alt" style="margin-right:5px;"></i>
+                <a href="#" style="text-decoration:none; color:#333; font-size:12px; font-weight:bold;">
+                    <i class="fas fa-comment-alt" style="margin-right:5px; color:#3b5998;"></i>
                     <span id="count-mensajes">0</span> mensajes nuevos
                 </a>
             </div>
             <div class="notif-item">
-                <a href="#" style="text-decoration:none; color:#999; font-size:12px; font-weight:bold;">
-                    <i class="fas fa-user-plus" style="margin-right:5px;"></i>
+                <a href="#" style="text-decoration:none; color:#333; font-size:12px; font-weight:bold;">
+                    <i class="fas fa-user-plus" style="margin-right:5px; color:#3b5998;"></i>
                     <span id="count-amigos">0</span> solicitudes
                 </a>
             </div>
@@ -177,6 +177,7 @@
 
         document.getElementById('userName').innerText = nombre || "Usuario";
 
+        // Lógica de foto mejorada
         if (foto && foto !== 'null' && foto !== 'undefined') {
             document.getElementById('userImg').src = `${BASE_URL}/uploads/${foto}`;
         } else {
@@ -262,6 +263,24 @@
         cargarPosts();
     }
 
+    // FUNCIÓN SUBIR FOTO DESDE EL AVATAR
+    async function subirFotoManual() {
+        const fileInput = document.getElementById('inputFoto');
+        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
+        if (!fileInput.files[0]) return;
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        try {
+            const resp = await fetch(`${BASE_URL}/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
+            if (resp.ok) {
+                const data = await resp.json();
+                localStorage.setItem('usuarioFoto', data.url);
+                location.reload();
+            }
+        } catch(e) { alert("Error al subir foto"); }
+    }
+
+    // FUNCIÓN SUBIR FOTO DESDE HEADER Y PUBLICAR
     async function subirYCompartirFoto() {
         const fileInput = document.getElementById('inputSubirTodo');
         const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
@@ -300,7 +319,10 @@
 
     let receptorIdActual = null;
     setInterval(() => { if (receptorIdActual) actualizarMensajes(); }, 3000);
-    window.borrarPost = borrarPost; window.abrirChat = abrirChat; window.enviarMensajeChat = enviarMensajeChat;
+    window.borrarPost = borrarPost;
+    window.abrirChat = abrirChat;
+    window.enviarMensajeChat = enviarMensajeChat;
+    window.subirFotoManual = subirFotoManual;
 </script>
 </body>
 </html>
