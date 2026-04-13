@@ -4,14 +4,76 @@
     <meta charset="UTF-8">
     <title>Thirty - Registro</title>
     <style>
-        body { background-color: #e9eff4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; }
-        header { background-color: #3b5998; color: white; padding: 15px 50px; font-size: 28px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .container { display: flex; justify-content: center; margin-top: 50px; }
-        .card { background: white; padding: 30px; border: 1px solid #bdc3c7; width: 350px; border-radius: 4px; }
-        input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box; }
-        button { background-color: #3b5998; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; font-size: 16px; font-weight: bold; }
+        body {
+            background-color: #e9eff4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #3b5998;
+            color: white;
+            padding: 15px 50px;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1; /* Esto centra la tarjeta verticalmente en el espacio sobrante */
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border: 1px solid #bdc3c7;
+            width: 350px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            height: auto; /* La caja crece según el contenido */
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box; /* Evita que el input se salga por los lados */
+        }
+        button {
+            background-color: #3b5998;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 3px;
+        }
         button:hover { background-color: #2d4373; }
-        #mensaje { margin-top: 15px; color: green; font-weight: bold; text-align: center; }
+        #mensaje {
+            margin-top: 15px;
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            min-height: 1.2em;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #606770;
+        }
+        .login-link a {
+            color: #3b5998;
+            font-weight: bold;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -20,33 +82,42 @@
 
 <div class="container">
     <div class="card">
-        <h2 style="color: #3b5998; margin-top: 0;">Crea tu perfil</h2>
+        <h2 style="color: #3b5998; margin-top: 0; text-align: center;">Crea tu perfil</h2>
+
         <input type="text" id="firstName" placeholder="Nombre">
         <input type="text" id="lastName" placeholder="Apellido">
         <input type="email" id="email" placeholder="Correo electrónico">
         <input type="password" id="password" placeholder="Contraseña">
-        <button onclick="enviarRegistro()">¡Regístrate!</button>
-        <div id="mensaje"></div>
-        <p style="text-align: center; margin-top: 15px;">
-            ¿Ya tienes cuenta? <a href="login.html" style="color: #3b5998; font-weight: bold;">Inicia sesión aquí</a>
-        </p>
-    </div>
 
+        <button onclick="enviarRegistro()">¡Regístrate!</button>
+
+        <div id="mensaje"></div>
+
+        <div class="login-link">
+            ¿Ya tienes cuenta? <a href="login.html">Inicia sesión aquí</a>
+        </div>
+    </div>
 </div>
 
 <script>
-    // Si ya hay una sesión guardada, mándalo directo a la home
-    if (localStorage.getItem('sesionIniciada') === 'true') {
-        window.location.href = "home.html";
-    }
+    // 1. ELIMINAMOS LA REDIRECCIÓN AUTOMÁTICA AQUÍ
+    // Es mejor dejar que la gente vea siempre el registro por si quieren crear más cuentas.
+
     async function enviarRegistro() {
+        const mensajeDiv = document.getElementById('mensaje');
         const usuario = {
             firstName: document.getElementById('firstName').value,
             lastName: document.getElementById('lastName').value,
             email: document.getElementById('email').value,
-            passwordHash: document.getElementById('password').value, // En el futuro lo encriptaremos
+            passwordHash: document.getElementById('password').value,
             bio: "¡Hola! Ya estoy en Thirty."
         };
+
+        // Validación básica antes de enviar
+        if (!usuario.firstName || !usuario.email || !usuario.passwordHash) {
+            mensajeDiv.innerText = "Faltan campos obligatorios";
+            return;
+        }
 
         try {
             const response = await fetch('https://thirty-poqp.onrender.com/api/users/register', {
@@ -57,16 +128,21 @@
 
             if (response.ok) {
                 const data = await response.json();
-                // Guardamos el nombre para usarlo en la siguiente página
+
+                // 2. IMPORTANTE: Guardamos la sesión para que home.html nos deje entrar
+                localStorage.setItem('sesionIniciada', 'true');
+                localStorage.setItem('usuarioID', data.id);
                 localStorage.setItem('usuarioNombre', data.firstName);
-                // ¡Redirección mágica!
+
+                // Redirección a la home
                 window.location.href = "home.html";
             } else {
-                document.getElementById('mensaje').style.color = "red";
-                document.getElementById('mensaje').innerText = "Error al registrar.";
+                mensajeDiv.style.color = "red";
+                mensajeDiv.innerText = "Error: El email ya existe o hay un fallo.";
             }
         } catch (error) {
             console.error("Error:", error);
+            mensajeDiv.innerText = "Error de conexión con el servidor.";
         }
     }
 </script>
