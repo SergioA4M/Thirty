@@ -41,11 +41,7 @@
         const email = document.getElementById('email').value;
         const pass = document.getElementById('password').value;
         const errorDiv = document.getElementById('error');
-
-        if (!email || !pass) {
-            errorDiv.innerText = "Por favor, rellena todos los campos";
-            return;
-        }
+        const BASE_URL = 'https://thirty-poqp.onrender.com';
 
         try {
             const response = await fetch(`${BASE_URL}/api/users/login`, {
@@ -53,34 +49,33 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     email: email,
-                    password: pass // Cambiado de passwordHash a password para coincidir con el backend
+                    password: pass,         // Algunos backends usan esto
+                    passwordHash: pass      // Otros usan esto
                 })
             });
 
             if (response.ok) {
                 const data = await response.json();
 
-                // --- GUARDADO ROBUSTO (Para que Home y Perfil lo encuentren sí o sí) ---
+                // GUARDAMOS TODO PARA QUE EL HOME NO TE ECHE
                 localStorage.setItem('sesionIniciada', 'true');
-                localStorage.setItem('usuarioID', data.id); // Mayúscula (la que usa Perfil)
-                localStorage.setItem('usuarioId', data.id); // Minúscula (la que usa Home)
+                localStorage.setItem('usuarioID', data.id);
+                localStorage.setItem('usuarioId', data.id); // Duplicado por seguridad
 
-                // Guardamos el nombre (usando firstName que es lo que devuelve tu API)
-                const nombreAMostrar = data.firstName || data.nombre || 'Usuario';
-                localStorage.setItem('usuarioNombre', nombreAMostrar);
+                // Guardamos el nombre (buscando cualquier variante que devuelva tu API)
+                const nombre = data.firstName || data.nombre || data.username || "Usuario";
+                localStorage.setItem('usuarioNombre', nombre);
 
-                // Guardamos la foto
+                // Guardamos la foto si existe
                 if (data.fotoPerfil) {
                     localStorage.setItem('usuarioFoto', data.fotoPerfil);
                 }
 
-                console.log("Sesión guardada correctamente. Redirigiendo...");
                 window.location.href = "home.html";
             } else {
-                errorDiv.innerText = "Email o contraseña incorrectos";
+                errorDiv.innerText = "Error 401: Usuario o contraseña incorrectos";
             }
         } catch (e) {
-            console.error("Error en el login:", e);
             errorDiv.innerText = "Error de conexión con el servidor";
         }
     }
