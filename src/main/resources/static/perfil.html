@@ -160,26 +160,25 @@
 </div>
 
 <script>
+    // --- CORRECCIÓN DE CONEXIÓN RENDER ---
+    const BASE_URL = 'https://thirty-poqp.onrender.com';
     const params = new URLSearchParams(window.location.search);
-    const miId = localStorage.getItem('usuarioId');
+
+    // Corregimos usuarioID para que no sea null
+    const miId = localStorage.getItem('usuarioID');
     const miNombre = localStorage.getItem('usuarioNombre');
     let perfilId = params.get('id') || miId;
 
-    // --- 1. PARSEADOR DEFINITIVO (Soporta paréntesis, espacios y .avif) ---
+    // --- PARSEADOR MANTENIDO ---
     function parsearContenido(texto) {
         if (!texto) return "";
         let contenido = texto;
-
-        // Detectar imágenes locales /uploads/ (incluso con nombres raros)
         const imgLocalRegex = /\/uploads\/[^\s<>"]+/gi;
         contenido = contenido.replace(imgLocalRegex, (match) => {
-            return `<img src="${match}" style="max-width:100%; border-radius:8px; margin-top:10px; display:block; border:1px solid #ddd;">`;
+            return `<img src="${BASE_URL}${match}" style="max-width:100%; border-radius:8px; margin-top:10px; display:block; border:1px solid #ddd;">`;
         });
-
-        // YouTube
         const ytRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/gi;
         contenido = contenido.replace(ytRegex, '<div style="margin:10px 0; position:relative; padding-bottom:56.25%; height:0; overflow:hidden;"><iframe style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:8px;" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>');
-
         return contenido;
     }
 
@@ -192,7 +191,7 @@
     };
 
     async function cargarDatosPerfil() {
-        const resp = await fetch(`/api/users/${perfilId}`);
+        const resp = await fetch(`${BASE_URL}/api/users/${perfilId}`);
         if (resp.ok) {
             const user = await resp.json();
             document.getElementById('perfilNombreCompleto').innerText = user.firstName + " " + user.lastName;
@@ -200,7 +199,7 @@
             document.getElementById('perfilEstudios').innerText = user.estudios || "---";
             document.getElementById('perfilTrayectoria').innerText = user.trayectoria || "---";
             document.getElementById('perfilZonas').innerText = user.zonasMarcha || "---";
-            if (user.fotoPerfil) document.getElementById('perfilImg').src = "/uploads/" + user.fotoPerfil;
+            if (user.fotoPerfil) document.getElementById('perfilImg').src = BASE_URL + "/uploads/" + user.fotoPerfil;
 
             if (perfilId !== miId) {
                 const elementosOcultar = ['btnEditarInfo', 'btnSubirFoto', 'btnEditarEspacio', 'iconEditBio', 'btnSubirHeader'];
@@ -209,16 +208,13 @@
         }
     }
 
-    // --- 2. TABLÓN (Mezcla de comentarios y posts con fotos) ---
     async function cargarComentarios() {
         try {
-            const respCom = await fetch(`/api/comentarios/perfil/${perfilId}`);
+            const respCom = await fetch(`${BASE_URL}/api/comentarios/perfil/${perfilId}`);
             const comentarios = await respCom.json();
-
-            const respPosts = await fetch('http://localhost:8080/api/posts');
+            const respPosts = await fetch(`${BASE_URL}/api/posts`);
             const todosLosPosts = await respPosts.json();
 
-            // Filtramos posts del dueño del perfil (esto muestra sus fotos subidas)
             const nombreDuenio = document.getElementById('perfilNombreCompleto').innerText.split(' ')[0];
             const misPosts = todosLosPosts.filter(p => p.author === nombreDuenio);
 
@@ -226,25 +222,21 @@
                 ...comentarios.map(c => ({...c, tipo: 'comentario'})),
                 ...misPosts.map(p => ({...p, tipo: 'post'}))
             ];
-
             listaMix.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
             const div = document.getElementById('listaComentarios');
             div.innerHTML = "";
-
             listaMix.forEach(item => {
                 const esPost = item.tipo === 'post';
                 const autor = esPost ? item.author : item.autor.firstName;
                 const textoFinal = esPost ? parsearContenido(item.content) : item.contenido;
-                const avatar = esPost ? `https://ui-avatars.com/api/?name=${autor}&background=3b5998&color=fff` : (item.autor.fotoPerfil ? `/uploads/${item.autor.fotoPerfil}` : 'https://via.placeholder.com/40');
+                const avatar = esPost ? `https://ui-avatars.com/api/?name=${autor}&background=3b5998&color=fff` : (item.autor.fotoPerfil ? `${BASE_URL}/uploads/${item.autor.fotoPerfil}` : 'https://via.placeholder.com/40');
 
                 div.innerHTML += `
                     <div class="card" style="display: flex; gap: 10px; padding: 10px; border-radius: 4px; ${esPost ? 'border-left: 4px solid #3b5998;' : ''}">
                         <img src="${avatar}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 2px;">
                         <div style="flex: 1;">
-                            <div style="font-weight: bold; color: #3b5998; font-size: 12px;">
-                                ${autor} ${esPost ? '<span style="color:#999; font-weight:normal;">(Actualización)</span>' : ''}
-                            </div>
+                            <div style="font-weight: bold; color: #3b5998; font-size: 12px;">${autor}</div>
                             <div style="font-size: 13px; margin-top:3px;">${textoFinal}</div>
                         </div>
                     </div>`;
@@ -252,78 +244,56 @@
         } catch (e) { console.error(e); }
     }
 
-    // --- 3. SUBIR Y COMPARTIR (Álbum + Tablón + Home) ---
     async function subirYCompartirFoto() {
         const fileInput = document.getElementById('inputSubirTodo');
         if (!fileInput.files[0]) return;
-
         const formData = new FormData();
         formData.append("file", fileInput.files[0]);
-
         try {
-            // A) Guardar en Álbum
-            const respFoto = await fetch(`/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
+            const respFoto = await fetch(`${BASE_URL}/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
             if (respFoto.ok) {
                 const data = await respFoto.json();
-                const nombreArchivo = data.url;
-                const rutaImagen = `/uploads/${nombreArchivo}`;
-
-                // B) Crear Post para Tablón y Home
-                await fetch('http://localhost:8080/api/posts', {
+                await fetch(`${BASE_URL}/api/posts`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        author: miNombre,
-                        content: `Nueva foto en mi álbum: ${rutaImagen}`
-                    })
+                    body: JSON.stringify({ author: miNombre, content: `Nueva foto: /uploads/${data.url}` })
                 });
-
-                alert("¡Foto guardada y publicada!");
                 location.reload();
             }
-        } catch (e) { alert("Error al procesar"); }
+        } catch (e) { alert("Error"); }
     }
 
-    // --- 4. ÁLBUM (Cuadrícula de la derecha) ---
     async function cargarAlbum() {
         try {
-            const resp = await fetch(`/api/fotos/usuario/${perfilId}`);
+            const resp = await fetch(`${BASE_URL}/api/fotos/usuario/${perfilId}`);
             if (resp.ok) {
                 const fotos = await resp.json();
                 const div = document.getElementById('cuadriculaFotos');
-                div.innerHTML = "";
-                // Mostramos las últimas 6 fotos
-                fotos.reverse().slice(0, 6).forEach(f => {
-                    div.innerHTML += `
-                        <div style="aspect-ratio: 1/1; overflow: hidden; border: 1px solid #ddd;">
-                            <img src="/uploads/${f.url}" style="width:100%; height:100%; object-fit:cover;">
-                        </div>`;
-                });
+                div.innerHTML = fotos.reverse().slice(0, 6).map(f => `
+                    <div style="aspect-ratio: 1/1; overflow: hidden; border: 1px solid #ddd;">
+                        <img src="${BASE_URL}/uploads/${f.url}" style="width:100%; height:100%; object-fit:cover;">
+                    </div>`).join('');
             }
         } catch (e) { }
     }
 
-    // --- FUNCIONES EXTRA (Bio, Amigos, Modal) ---
     async function cargarAmigos() {
-        const resp = await fetch('/api/users');
+        const resp = await fetch(`${BASE_URL}/api/users`);
         if (resp.ok) {
             const usuarios = await resp.json();
             const div = document.getElementById('listaAmigosPerfil');
-            div.innerHTML = "";
-            usuarios.filter(u => u.id != perfilId).slice(0, 9).forEach(u => {
-                const foto = u.fotoPerfil ? `/uploads/${u.fotoPerfil}` : 'https://via.placeholder.com/60';
-                div.innerHTML += `<a href="perfil.html?id=${u.id}" class="amigo-item"><img src="${foto}"><div>${u.firstName}</div></a>`;
-            });
+            div.innerHTML = usuarios.filter(u => u.id != perfilId).slice(0, 9).map(u => {
+                const foto = u.fotoPerfil ? `${BASE_URL}/uploads/${u.fotoPerfil}` : 'https://via.placeholder.com/60';
+                return `<a href="perfil.html?id=${u.id}" class="amigo-item"><img src="${foto}"><div>${u.firstName}</div></a>`;
+            }).join('');
         }
     }
 
     async function publicarComentario() {
         const texto = document.getElementById('nuevoComentario').value;
         if (!texto.trim()) return;
-        await fetch(`/api/comentarios/${perfilId}/${miId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
-            body: texto
+        await fetch(`${BASE_URL}/api/comentarios/${perfilId}/${miId}`, {
+            method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: texto
         });
         document.getElementById('nuevoComentario').value = "";
         cargarComentarios();
@@ -334,43 +304,27 @@
         document.getElementById('editBioContainer').style.display = 'flex';
         document.getElementById('inputBio').value = document.getElementById('perfilBio').innerText.replace(/"/g, "");
     }
-
     function cancelarEdicionBio() {
         document.getElementById('displayBio').style.display = 'block';
         document.getElementById('editBioContainer').style.display = 'none';
     }
-
     async function actualizarEstadoRapido() {
         const nuevoTexto = document.getElementById('inputBio').value;
-        const datos = {
-            bio: nuevoTexto,
-            estudios: document.getElementById('perfilEstudios').innerText,
-            trayectoria: document.getElementById('perfilTrayectoria').innerText,
-            zonasMarcha: document.getElementById('perfilZonas').innerText
-        };
-        await fetch(`/api/users/${miId}/perfil`, {
+        await fetch(`${BASE_URL}/api/users/${miId}/perfil`, {
             method: 'PUT', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(datos)
+            body: JSON.stringify({ bio: nuevoTexto })
         });
         location.reload();
     }
-
-    function abrirModalPerfil() {
-        document.getElementById('editEstudios').value = document.getElementById('perfilEstudios').innerText;
-        document.getElementById('editTrayectoria').value = document.getElementById('perfilTrayectoria').innerText;
-        document.getElementById('editZonas').value = document.getElementById('perfilZonas').innerText;
-        document.getElementById('modalPerfil').style.display = 'block';
-    }
+    function abrirModalPerfil() { document.getElementById('modalPerfil').style.display = 'block'; }
     function cerrarModalPerfil() { document.getElementById('modalPerfil').style.display = 'none'; }
-
     async function guardarPerfil() {
         const datos = {
             estudios: document.getElementById('editEstudios').value,
             trayectoria: document.getElementById('editTrayectoria').value,
-            zonasMarcha: document.getElementById('editZonas').value,
-            bio: document.getElementById('perfilBio').innerText.replace(/"/g, "")
+            zonasMarcha: document.getElementById('editZonas').value
         };
-        await fetch(`/api/users/${miId}/perfil`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+        await fetch(`${BASE_URL}/api/users/${miId}/perfil`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
         location.reload();
     }
 </script>
