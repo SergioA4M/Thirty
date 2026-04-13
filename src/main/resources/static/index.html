@@ -28,9 +28,16 @@
         <button onclick="enviarRegistro()">¡Regístrate!</button>
         <div id="mensaje"></div>
     </div>
+    <p style="text-align: center; margin-top: 15px;">
+        ¿Ya tienes cuenta? <a href="login.html" style="color: #3b5998; font-weight: bold;">Inicia sesión aquí</a>
+    </p>
 </div>
 
 <script>
+    // Si ya hay una sesión guardada, mándalo directo a la home
+    if (localStorage.getItem('sesionIniciada') === 'true') {
+        window.location.href = "home.html";
+    }
     async function enviarRegistro() {
         const usuario = {
             firstName: document.getElementById('firstName').value,
