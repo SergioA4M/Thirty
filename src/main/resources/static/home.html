@@ -33,7 +33,6 @@
         .nav-active { background-color: #2d4373; }
 
         #emoji-picker-container { position: absolute; z-index: 999; top: 100%; left: 0; display: none; margin-top: 5px; }
-
         .btn-subir-header { background: #4c66a4; color: white; border: 1px solid #2d4373; padding: 5px 10px; cursor: pointer; font-weight: bold; border-radius: 3px; font-size: 11px; display: flex; align-items: center; gap: 5px; margin-left: 10px; }
     </style>
 </head>
@@ -62,10 +61,10 @@
         <div class="card">
             <input type="file" id="inputFoto" style="display: none;" accept="image/*" onchange="subirFotoManual()">
             <div class="profile-container" onclick="document.getElementById('inputFoto').click()" style="text-align:center; cursor:pointer;">
-                <img id="userImg" src="https://via.placeholder.com/100" style="width: 100px; height: 100px; object-fit: cover; border-radius: 2px;">
+                <img id="userImg" src="https://ui-avatars.com/api/?name=U&background=3b5998&color=fff" style="width: 100px; height: 100px; object-fit: cover; border-radius: 2px;">
                 <div style="font-size: 10px; color: #3b5998; margin-top: 2px;">Cambiar foto</div>
             </div>
-            <h4 id="userName" style="margin:5px 0 0 0; text-align:center;">Cargando...</h4>
+            <h4 id="userName" style="margin:5px 0 0 0; text-align:center;">Usuario</h4>
         </div>
 
         <div class="card" id="seccion-notificaciones" style="padding: 10px; line-height: 1.8;">
@@ -110,22 +109,19 @@
                 <button onclick="publicarMensaje()" style="background:#3b5998; color:white; border:none; padding:6px 20px; cursor:pointer; font-weight:bold;">Publicar</button>
             </div>
         </div>
-        <span class="feed-title" style="font-weight:bold; color:#666; font-size:13px; display:block; margin-bottom:10px;">Novedades de tus amistades</span>
         <div id="muro"></div>
     </div>
 
     <div class="right-col">
         <div class="card" style="padding:0; height: 500px; display: flex; flex-direction: column;">
             <div id="chat-header" style="background: #f6f7f9; padding: 10px; border-bottom: 1px solid #bdc3c7; font-weight: bold; font-size: 13px; color: #3b5998;">
-                Selecciona un contacto
+                Chat
             </div>
-            <div id="chat-window" style="flex:1; padding:10px; font-size:13px; overflow-y: auto; background: #f0f2f5;">
-                <p style="color:gray; text-align:center; margin-top:50px;">Haz clic en un amigo para hablar</p>
-            </div>
+            <div id="chat-window" style="flex:1; padding:10px; font-size:13px; overflow-y: auto; background: #f0f2f5;"></div>
             <div id="chat-input-area" style="padding: 10px; border-top: 1px solid #bdc3c7; display:none;">
                 <div style="display:flex; gap:5px;">
-                    <input type="text" id="mensajeTexto" placeholder="Escribe un mensaje..." style="flex:1; border:1px solid #ccc; border-radius:15px; padding:5px 12px; outline:none;">
-                    <button onclick="enviarMensajeChat()" style="background:#3b5998; color:white; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer;">
+                    <input type="text" id="mensajeTexto" style="flex:1; border:1px solid #ccc; border-radius:15px; padding:5px;">
+                    <button onclick="enviarMensajeChat()" style="background:#3b5998; color:white; border:none; border-radius:50%; width:30px; height:30px;">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
@@ -136,89 +132,86 @@
 
 <script type="module">
     import { Picker } from 'https://cdn.jsdelivr.net/npm/emoji-mart@5.5.2/+esm'
-    const pickerOptions = {
+    const picker = new Picker({
         onEmojiSelect: (emoji) => {
-            const textarea = document.getElementById('textoPost');
-            textarea.value += emoji.native;
+            document.getElementById('textoPost').value += emoji.native;
             document.getElementById('emoji-picker-container').style.display = 'none';
         },
         locale: 'es', theme: 'light'
-    }
-    const picker = new Picker(pickerOptions);
+    });
     document.getElementById('emoji-picker-container').appendChild(picker);
-    window.toggleEmojiPicker = () => {
-        const container = document.getElementById('emoji-picker-container');
-        container.style.display = (container.style.display === 'none' || container.style.display === '') ? 'block' : 'none';
-    }
-    document.getElementById('emoji-trigger').addEventListener('click', window.toggleEmojiPicker);
+    document.getElementById('emoji-trigger').onclick = () => {
+        const c = document.getElementById('emoji-picker-container');
+        c.style.display = c.style.display === 'none' ? 'block' : 'none';
+    };
 </script>
 
 <script>
     const BASE_URL = 'https://thirty-poqp.onrender.com';
+    let receptorIdActual = null;
 
     function parsearContenido(texto) {
         if (!texto) return "";
         let contenido = texto;
-        const imgLocalRegex = /\/uploads\/[^\s<>"]+/gi;
-        contenido = contenido.replace(imgLocalRegex, (match) => {
-            return `<img src="${BASE_URL}${match}" style="max-width:100%; border-radius:8px; margin-top:10px; display:block; border:1px solid #ddd;">`;
-        });
-        const ytRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/gi;
-        contenido = contenido.replace(ytRegex, '<div style="margin:10px 0; position:relative; padding-bottom:56.25%; height:0; overflow:hidden;"><iframe style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:8px;" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>');
+        const imgRegex = /\/uploads\/[^\s<>"]+/gi;
+        contenido = contenido.replace(imgRegex, (match) => `<img src="${BASE_URL}${match}" style="max-width:100%; border-radius:8px; display:block; margin-top:10px;">`);
         return contenido;
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
-        if (!miId) { window.location.href = "login.html"; return; }
-
         const nombre = localStorage.getItem('usuarioNombre');
         const foto = localStorage.getItem('usuarioFoto');
+        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
 
-        document.getElementById('userName').innerText = nombre || "Usuario";
-
-        // Lógica de foto mejorada
-        if (foto && foto !== 'null' && foto !== 'undefined') {
+        // HE QUITADO EL REBOTE AL LOGIN. Si no hay ID, simplemente no cargará los datos, pero te dejará ver la página.
+        if (nombre) document.getElementById('userName').innerText = nombre;
+        if (foto && foto !== 'null') {
             document.getElementById('userImg').src = `${BASE_URL}/uploads/${foto}`;
-        } else {
-            document.getElementById('userImg').src = `https://ui-avatars.com/api/?name=${nombre || 'U'}&background=3b5998&color=fff`;
+        } else if (nombre) {
+            document.getElementById('userImg').src = `https://ui-avatars.com/api/?name=${nombre}&background=3b5998&color=fff`;
         }
 
         cargarPosts();
-        cargarAmigosSidebar();
-        actualizarNotificaciones();
+        if (miId) {
+            cargarAmigosSidebar();
+            actualizarNotificaciones();
+        }
     });
 
     async function cargarPosts() {
         try {
-            const response = await fetch(`${BASE_URL}/api/posts`);
-            const posts = await response.json();
+            const r = await fetch(`${BASE_URL}/api/posts`);
+            const posts = await r.json();
             const muro = document.getElementById('muro');
             muro.innerHTML = "";
-            posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            posts.forEach(post => {
-                const fecha = new Date(post.createdAt).toLocaleString();
-                const contenidoParsed = parsearContenido(post.content);
-                const avatarUrl = `https://ui-avatars.com/api/?name=${post.author}&background=3b5998&color=fff`;
-                const botonBorrar = (post.author === localStorage.getItem('usuarioNombre'))
-                    ? `<i class="fas fa-trash-alt" onclick="borrarPost(${post.id})" style="cursor:pointer; color:#ccc; font-size:12px; float:right;"></i>`
-                    : "";
-                muro.innerHTML += `<div class="post" id="post-${post.id}"><img src="${avatarUrl}" class="avatar"><div class="post-content"><div class="post-header">${botonBorrar}<span>${post.author}</span></div><div style="font-size:14px; margin-top:5px;">${contenidoParsed}</div><div class="post-time">${fecha}</div></div></div>`;
+            posts.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(p => {
+                const avatar = `https://ui-avatars.com/api/?name=${p.author}&background=3b5998&color=fff`;
+                const borrar = (p.author === localStorage.getItem('usuarioNombre')) ? `<i class="fas fa-trash-alt" onclick="borrarPost(${p.id})" style="float:right; cursor:pointer; color:#ccc;"></i>` : "";
+                muro.innerHTML += `<div class="post"><img src="${avatar}" class="avatar"><div class="post-content"><div class="post-header">${borrar}${p.author}</div><div>${parsearContenido(p.content)}</div><div class="post-time">${new Date(p.createdAt).toLocaleString()}</div></div></div>`;
             });
-        } catch (e) { console.error("Error posts"); }
+        } catch(e) {}
+    }
+
+    async function publicarMensaje() {
+        const t = document.getElementById('textoPost');
+        if(!t.value.trim()) return;
+        await fetch(`${BASE_URL}/api/posts`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({author: localStorage.getItem('usuarioNombre') || 'Anonimo', content: t.value})
+        });
+        t.value = "";
+        cargarPosts();
     }
 
     async function cargarAmigosSidebar() {
-        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
+        const id = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
         try {
-            const response = await fetch(`${BASE_URL}/api/users/${miId}/amigos`);
-            const amigos = await response.json();
-            const contenedor = document.getElementById('lista-contactos');
-            contenedor.innerHTML = amigos.length ? "" : "<p style='color:gray; font-size:12px;'>Sin amigos.</p>";
-            amigos.forEach(amigo => {
-                contenedor.innerHTML += `<div onclick="abrirChat('${amigo.id}', '${amigo.firstName}')" style="display:flex; align-items:center; gap:10px; margin-bottom:12px; cursor:pointer;"><div style="width:8px; height:8px; background:#2ecc71; border-radius:50%;"></div><span style="font-size:14px;">${amigo.firstName} ${amigo.lastName}</span></div>`;
-            });
-        } catch (e) { }
+            const r = await fetch(`${BASE_URL}/api/users/${id}/amigos`);
+            const amigos = await r.json();
+            const cont = document.getElementById('lista-contactos');
+            cont.innerHTML = amigos.map(a => `<div onclick="abrirChat('${a.id}', '${a.firstName}')" style="cursor:pointer; margin-bottom:10px;"><i class="fas fa-circle" style="color:#2ecc71; font-size:8px;"></i> ${a.firstName}</div>`).join('');
+        } catch(e){}
     }
 
     async function abrirChat(id, nombre) {
@@ -229,100 +222,66 @@
     }
 
     async function actualizarMensajes() {
-        if (!receptorIdActual) return;
+        if(!receptorIdActual) return;
         const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
         try {
-            const response = await fetch(`${BASE_URL}/api/mensajes/historial/${miId}/${receptorIdActual}`);
-            const mensajes = await response.json();
-            const win = document.getElementById('chat-window');
-            win.innerHTML = mensajes.map(m => {
-                const soyYo = m.emisor.id == miId;
-                return `<div style="text-align:${soyYo?'right':'left'}; margin-bottom:10px;"><span style="background:${soyYo?'#dcf8c6':'white'}; padding:6px 10px; border-radius:8px; display:inline-block; max-width:80%;">${m.contenido}</span></div>`;
-            }).join('');
-            win.scrollTop = win.scrollHeight;
+            const r = await fetch(`${BASE_URL}/api/mensajes/historial/${miId}/${receptorIdActual}`);
+            const msgs = await r.json();
+            document.getElementById('chat-window').innerHTML = msgs.map(m => `<div style="text-align:${m.emisor.id == miId ? 'right' : 'left'};"><span style="background:${m.emisor.id == miId ? '#dcf8c6' : '#fff'}; padding:5px 10px; border-radius:10px; display:inline-block; margin:2px;">${m.contenido}</span></div>`).join('');
         } catch(e){}
     }
 
     async function enviarMensajeChat() {
-        const input = document.getElementById('mensajeTexto');
+        const i = document.getElementById('mensajeTexto');
         const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
-        if (!input.value.trim() || !receptorIdActual) return;
-        const res = await fetch(`${BASE_URL}/api/mensajes/enviar?emisorId=${miId}&receptorId=${receptorIdActual}`, { method: 'POST', body: input.value });
-        if (res.ok) { input.value = ""; actualizarMensajes(); }
+        if(!i.value.trim() || !receptorIdActual) return;
+        await fetch(`${BASE_URL}/api/mensajes/enviar?emisorId=${miId}&receptorId=${receptorIdActual}`, {method: 'POST', body: i.value});
+        i.value = "";
+        actualizarMensajes();
     }
 
-    async function publicarMensaje() {
-        const el = document.getElementById('textoPost');
-        if (!el.value.trim()) return;
-        await fetch(`${BASE_URL}/api/posts`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ author: localStorage.getItem('usuarioNombre'), content: el.value })
-        });
-        el.value = "";
-        cargarPosts();
-    }
-
-    // FUNCIÓN SUBIR FOTO DESDE EL AVATAR
     async function subirFotoManual() {
-        const fileInput = document.getElementById('inputFoto');
-        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
-        if (!fileInput.files[0]) return;
-        const formData = new FormData();
-        formData.append("file", fileInput.files[0]);
-        try {
-            const resp = await fetch(`${BASE_URL}/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
-            if (resp.ok) {
-                const data = await resp.json();
-                localStorage.setItem('usuarioFoto', data.url);
-                location.reload();
-            }
-        } catch(e) { alert("Error al subir foto"); }
+        const f = document.getElementById('inputFoto');
+        const id = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
+        if(!f.files[0]) return;
+        const fd = new FormData(); fd.append("file", f.files[0]);
+        const r = await fetch(`${BASE_URL}/api/fotos/upload/${id}`, {method: 'POST', body: fd});
+        if(r.ok) { const d = await r.json(); localStorage.setItem('usuarioFoto', d.url); location.reload(); }
     }
 
-    // FUNCIÓN SUBIR FOTO DESDE HEADER Y PUBLICAR
     async function subirYCompartirFoto() {
-        const fileInput = document.getElementById('inputSubirTodo');
-        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
-        if (!fileInput.files[0]) return;
-        const formData = new FormData();
-        formData.append("file", fileInput.files[0]);
-        try {
-            const respFoto = await fetch(`${BASE_URL}/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
-            if (respFoto.ok) {
-                const data = await respFoto.json();
-                await fetch(`${BASE_URL}/api/posts`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ author: localStorage.getItem('usuarioNombre'), content: `He subido una nueva foto: /uploads/${data.url}` })
-                });
-                location.reload();
-            }
-        } catch (e) { alert("Error al subir"); }
+        const f = document.getElementById('inputSubirTodo');
+        const id = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
+        if(!f.files[0]) return;
+        const fd = new FormData(); fd.append("file", f.files[0]);
+        const r = await fetch(`${BASE_URL}/api/fotos/upload/${id}`, {method: 'POST', body: fd});
+        if(r.ok) {
+            const d = await r.json();
+            await fetch(`${BASE_URL}/api/posts`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({author: localStorage.getItem('usuarioNombre'), content: `/uploads/${d.url}`})
+            });
+            location.reload();
+        }
     }
 
     async function borrarPost(id) {
-        if (confirm("¿Borrar?")) { await fetch(`${BASE_URL}/api/posts/${id}`, { method: 'DELETE' }); cargarPosts(); }
+        if(confirm("¿Borrar?")) { await fetch(`${BASE_URL}/api/posts/${id}`, {method: 'DELETE'}); cargarPosts(); }
     }
 
     async function actualizarNotificaciones() {
-        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
+        const id = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
         try {
-            const resp = await fetch(`${BASE_URL}/api/notificaciones/resumen/${miId}`);
-            if (resp.ok) {
-                const data = await resp.json();
-                document.getElementById('count-mensajes').innerText = data.mensajesNuevos || 0;
-                document.getElementById('count-amigos').innerText = data.solicitudesAmistad || 0;
-            }
-        } catch (e) { }
+            const r = await fetch(`${BASE_URL}/api/notificaciones/resumen/${id}`);
+            const d = await r.json();
+            document.getElementById('count-mensajes').innerText = d.mensajesNuevos || 0;
+            document.getElementById('count-amigos').innerText = d.solicitudesAmistad || 0;
+        } catch(e){}
     }
 
-    let receptorIdActual = null;
-    setInterval(() => { if (receptorIdActual) actualizarMensajes(); }, 3000);
-    window.borrarPost = borrarPost;
-    window.abrirChat = abrirChat;
-    window.enviarMensajeChat = enviarMensajeChat;
-    window.subirFotoManual = subirFotoManual;
+    setInterval(() => { if(receptorIdActual) actualizarMensajes(); }, 3000);
+    window.borrarPost = borrarPost; window.abrirChat = abrirChat; window.enviarMensajeChat = enviarMensajeChat; window.subirFotoManual = subirFotoManual;
 </script>
 </body>
 </html>
