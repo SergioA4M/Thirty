@@ -216,7 +216,7 @@
                 <h5 style="margin:0;"><i class="fas fa-images"></i> Álbum</h5>
                 <i class="fas fa-plus" style="cursor:pointer;color:#3b5998;" onclick="document.getElementById('albumInput').click()"></i>
             </div>
-            <input type="file" id="albumInput" class="hidden" accept="image/*" onchange="subirAlAlbum()">
+            <input type="file" id="albumInput" class="hidden" accept="image/*" multiple onchange="subirAlAlbum()">
             <div id="cuadriculaFotos" class="album-grid"></div>
         </div>
 
@@ -386,13 +386,16 @@ async function cargarTablon() {
         const comentarios = await respCom.json();
         const respPosts = await fetch(`${BASE_URL}/api/posts`);
         const todosLosPosts = await respPosts.json();
+        const respFotos = await fetch(`${BASE_URL}/api/fotos/usuario/${perfilId}`);
+        const fotos = respFotos.ok ? await respFotos.json() : [];
         
         const nombreDuenio = document.getElementById('perfilNombreCompleto').innerText.split(' ')[0];
         const misPosts = todosLosPosts.filter(p => p.author === nombreDuenio);
         
         let listaMix = [
             ...comentarios.map(c => ({...c, tipo: 'comentario', createdAt: c.fecha})),
-            ...misPosts.map(p => ({...p, tipo: 'post'}))
+            ...misPosts.map(p => ({...p, tipo: 'post'})),
+            ...fotos.map(f => ({...f, tipo: 'foto', content: `/uploads/${f.url}`, createdAt: f.fecha || f.createdAt}))
         ];
         listaMix.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
         
@@ -401,8 +404,12 @@ async function cargarTablon() {
         
         listaMix.forEach(item => {
             const esPost = item.tipo === 'post';
-            const autor = esPost ? item.author : (item.autor?.firstName || 'Usuario');
-            const contenido = esPost ? parsearContenido(item.content) : parsearContenido(item.contenido);
+            const esFoto = item.tipo === 'foto';
+            const autor = esPost ? item.author : (item.autor?.firstName || nombreDuenio);
+            let contenido = esPost ? parsearContenido(item.content) : parsearContenido(item.contenido);
+            if (esFoto) {
+                contenido = `<img src="${BASE_URL}${item.content}" style="max-width:100%;border-radius:8px;cursor:pointer;" onclick="abrirLightbox('${BASE_URL}${item.content}')">`;
+            }
             const avatar = esPost ? `https://ui-avatars.com/api/?name=${autor}&background=3b5998&color=fff&size=64` : (item.autor?.fotoPerfil ? `${BASE_URL}/uploads/${item.autor.fotoPerfil}` : `https://ui-avatars.com/api/?name=${autor}&background=3b5998&color=fff&size=64`);
             const esMio = autor === localStorage.getItem('usuarioNombre');
             const deleteBtn = esMio ? `<i class="fas fa-trash tablon-delete" onclick="eliminarTablon('${item.tipo}', ${item.id})"></i>` : '';
@@ -491,15 +498,16 @@ async function subirAlAlbum() {
     const fileInput = document.getElementById('albumInput');
     if (!fileInput.files[0]) return;
     
-    const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
+    for (let file of fileInput.files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        try {
+            await fetch(`${BASE_URL}/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
+        } catch (e) { console.log("Error subiendo foto"); }
+    }
     
-    try {
-        const respFoto = await fetch(`${BASE_URL}/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
-        if (respFoto.ok) {
-            cargarAlbum();
-        }
-    } catch (e) { alert("Error"); }
+    cargarAlbum();
     fileInput.value = '';
 }
 
