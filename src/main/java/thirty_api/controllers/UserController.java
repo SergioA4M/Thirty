@@ -41,8 +41,22 @@ public class UserController {
     private thirty_api.repositories.NotificacionRepository notificacionRepository;
 
     @PostMapping("/register")
-    public User registerUser(@RequestBody User user) {
-        return userRepository.save(user);
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
+        try {
+            if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
+                return ResponseEntity.badRequest().body("El nombre es obligatorio");
+            }
+            if (user.getEmail() == null || user.getEmail().isEmpty()) {
+                return ResponseEntity.badRequest().body("El email es obligatorio");
+            }
+            if (user.getPasswordHash() == null || user.getPasswordHash().isEmpty()) {
+                return ResponseEntity.badRequest().body("La contraseña es obligatoria");
+            }
+            user.setCreatedAt(LocalDateTime.now());
+            return ResponseEntity.ok(userRepository.save(user));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error al registrar: " + e.getMessage());
+        }
     }
 
     @PostMapping("/login")
