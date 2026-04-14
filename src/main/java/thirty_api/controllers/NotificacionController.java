@@ -43,13 +43,14 @@ public class NotificacionController {
         Map<String, Object> resumen = new HashMap<>();
 
         long mensajes = mensajeRepository.countByReceptorIdAndLeidoFalse(usuarioId);
-        long comentarios = comentarioRepository.countByPerfilIdAndLeidoFalse(usuarioId);
-        long notificacionesBD = notificacionRepository.countByUsuarioIdAndLeidoFalse(usuarioId);
+        long comentarios = notificacionRepository.countByUsuarioIdAndTipoAndLeidoFalse(usuarioId, "comentario");
+        long likes = notificacionRepository.countByUsuarioIdAndTipoAndLeidoFalse(usuarioId, "like");
         long solicitudes = notificacionRepository.countByUsuarioIdAndTipoAndLeidoFalse(usuarioId, "solicitud_amistad");
 
         resumen.put("mensajesNuevos", mensajes);
         resumen.put("comentariosNuevos", comentarios);
-        resumen.put("notificacionesTotales", mensajes + comentarios + notificacionesBD);
+        resumen.put("likesNuevos", likes);
+        resumen.put("notificacionesTotales", mensajes + comentarios + likes + solicitudes);
         resumen.put("solicitudesAmistad", solicitudes);
 
         return ResponseEntity.ok(resumen);

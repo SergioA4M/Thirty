@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import thirty_api.models.Like;
 import thirty_api.models.User;
 import thirty_api.models.Notificacion;
+import thirty_api.models.Post;
 import thirty_api.repositories.LikeRepository;
 import thirty_api.repositories.UserRepository;
 import thirty_api.repositories.PostRepository;
@@ -30,6 +31,7 @@ public class LikeController {
         Long usuarioId = ((Number) payload.get("usuarioId")).longValue();
         Long entidadId = ((Number) payload.get("entidadId")).longValue();
         String tipo = (String) payload.get("tipo");
+        Long receptorId = payload.containsKey("receptorId") ? ((Number) payload.get("receptorId")).longValue() : null;
 
         Optional<Like> likeExistente = likeRepository
             .findByUsuarioIdAndTipoAndEntidadId(usuarioId, tipo, entidadId);
@@ -39,8 +41,12 @@ public class LikeController {
             likeRepository.delete(likeExistente.get());
             liked = false;
         } else {
-            User usuario = userRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            User usuario = userRepository.findById(usuarioId).orElse(null);
+            if (usuario == null) {
+                Map<String, Object> error = new HashMap<>();
+                error.put("error", "Usuario no encontrado");
+                return ResponseEntity.badRequest().body(error);
+            }
 
             Like nuevoLike = new Like();
             nuevoLike.setUsuario(usuario);
@@ -49,13 +55,22 @@ public class LikeController {
             likeRepository.save(nuevoLike);
             liked = true;
 
-            if ("post".equals(tipo)) {
-                Notificacion notif = new Notificacion();
-                notif.setEmisor(usuario);
-                notif.setTipo("like");
-                notif.setContenido(usuario.getFirstName() + " le dio like a tu publicación");
-                notif.setEntidadId(entidadId);
-                notificacionRepository.save(notif);
+            if ("post".equals(tipo) && receptorId != null && !receptorId.equals(usuarioId)) {
+                User receptor = userRepository.findById(receptorId).orElse(null);
+                if (receptor != null) {
+                    long totalLikes = likeRepository.countByTipoAndEntidadId("post", entidadId);
+                    String contenido = totalLikes == 1 ? 
+                        usuario.getFirstName() + " le dio like a tu publicación" :
+                        usuario.getFirstName() + " y " + (totalLikes - 1) + " más le dieron like a tu publicación";
+                    
+                    Notificacion notif = new Notificacion();
+                    notif.setUsuario(receptor);
+                    notif.setEmisor(usuario);
+                    notif.setTipo("like");
+                    notif.setContenido(contenido);
+                    notif.setEntidadId(entidadId);
+                    notificacionRepository.save(notif);
+                }
             }
         }
 

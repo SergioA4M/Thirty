@@ -185,18 +185,31 @@
         <div class="card" style="padding: 10px;">
             <h5 style="display:flex; justify-content:space-between;">
                 <i class="fas fa-bell"></i> Notificaciones
+                <span id="notif-total-badge" style="background:#27ae60;color:white;border-radius:10px;padding:2px 8px;font-size:10px;display:none;">0</span>
             </h5>
             <div id="sidebar-notif" style="line-height:1.8;">
                 <div style="font-size:12px; margin-bottom:5px;">
-                    <a href="#" onclick="mostrarNotificaciones()" style="text-decoration:none; color:#27ae60;">
-                        <i class="fas fa-circle" style="font-size:6px; margin-right:5px;"></i>
-                        <span id="count-mensajes">0</span> mensajes nuevos
+                    <a href="#" onclick="mostrarNotificaciones(); return false;" style="text-decoration:none; color:#3498db;">
+                        <i class="fas fa-envelope" style="margin-right:5px;"></i>
+                        <span id="count-mensajes">0</span> mensaje(s) privado(s)
+                    </a>
+                </div>
+                <div style="font-size:12px; margin-bottom:5px;">
+                    <a href="#" onclick="mostrarNotificaciones(); return false;" style="text-decoration:none; color:#e74c3c;">
+                        <i class="fas fa-heart" style="margin-right:5px;"></i>
+                        <span id="count-likes">0</span> like(s)
+                    </a>
+                </div>
+                <div style="font-size:12px; margin-bottom:5px;">
+                    <a href="#" onclick="mostrarNotificaciones(); return false;" style="text-decoration:none; color:#e67e22;">
+                        <i class="fas fa-comment" style="margin-right:5px;"></i>
+                        <span id="count-comentarios">0</span> comentario(s)
                     </a>
                 </div>
                 <div style="font-size:12px;">
-                    <a href="#" onclick="mostrarNotificaciones()" style="text-decoration:none; color:#9b59b6;">
-                        <i class="fas fa-circle" style="font-size:6px; margin-right:5px;"></i>
-                        <span id="count-amigos">0</span> solicitudes
+                    <a href="#" onclick="mostrarNotificaciones(); return false;" style="text-decoration:none; color:#9b59b6;">
+                        <i class="fas fa-user-plus" style="margin-right:5px;"></i>
+                        <span id="count-amigos">0</span> solicitud(es)
                     </a>
                 </div>
             </div>
@@ -585,15 +598,19 @@ async function cargarPosts() {
     } catch(e) { console.log("Error posts"); }
 }
 
-async function toggleLike(entidadId, tipo, element) {
+async function toggleLike(entidadId, tipo, element, receptorId) {
     const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
     try {
         const res = await fetch(`${BASE_URL}/api/likes/toggle`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ usuarioId: parseInt(miId), entidadId, tipo })
+            body: JSON.stringify({ usuarioId: parseInt(miId), entidadId, tipo, receptorId })
         });
         const data = await res.json();
+        if (data.error) {
+            console.log(data.error);
+            return;
+        }
         element.classList.toggle('liked', data.liked);
         element.querySelector('span').textContent = data.count;
     } catch(e) {}
@@ -758,6 +775,17 @@ async function actualizarNotificaciones() {
         
         document.getElementById('count-mensajes').innerText = d.mensajesNuevos || 0;
         document.getElementById('count-amigos').innerText = d.solicitudesAmistad || 0;
+        document.getElementById('count-likes').innerText = d.likesNuevos || 0;
+        document.getElementById('count-comentarios').innerText = d.comentariosNuevos || 0;
+        
+        const total = (d.mensajesNuevos || 0) + (d.solicitudesAmistad || 0) + (d.likesNuevos || 0) + (d.comentariosNuevos || 0);
+        const badge = document.getElementById('notif-total-badge');
+        if (total > 0) {
+            badge.textContent = total;
+            badge.style.display = 'inline';
+        } else {
+            badge.style.display = 'none';
+        }
     } catch(e) {}
 }
 
@@ -790,12 +818,16 @@ async function cargarNotificaciones() {
             const iconColor = getNotifColor(n.tipo);
             const tiempo = formatTimeAgo(n.fecha);
             const unreadClass = n.leido ? '' : 'unread';
+            const aceptarBtn = (n.tipo === 'solicitud_amistad' && !n.leido) ? 
+                `<button onclick="aceptarAmistad(${n.emisor?.id}, ${n.id}); event.stopPropagation();" style="background:#27ae60;color:white;border:none;padding:5px 10px;border-radius:15px;font-size:11px;cursor:pointer;margin-top:5px;">Aceptar</button>` : '';
+            
             return `<div class="notif-item ${unreadClass}" onclick="handleNotifClick(${n.id}, '${n.tipo}', ${n.entidadId})">
                 <div class="notif-icon ${iconColor}"><i class="fas ${iconClass}"></i></div>
                 <div class="notif-content">
                     <strong>${n.emisor?.firstName || 'Sistema'}</strong>
                     <p>${n.contenido}</p>
                     <span class="notif-time">${tiempo}</span>
+                    ${aceptarBtn}
                 </div>
                 ${!n.leido ? '<div class="notif-badge notif-unread">1</div>' : ''}
             </div>`;
@@ -803,13 +835,23 @@ async function cargarNotificaciones() {
     } catch(e) { console.log("Error notificaciones"); }
 }
 
+async function aceptarAmistad(emisorId, notifId) {
+    const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
+    try {
+        await fetch(`${BASE_URL}/api/users/${miId}/agregar/${emisorId}`, { method: 'POST' });
+        await fetch(`${BASE_URL}/api/notificaciones/marcar-leida/${notifId}`, { method: 'POST' });
+        cargarNotificaciones();
+        actualizarNotificaciones();
+    } catch(e) { alert('Error al aceptar'); }
+}
+
 function getNotifIcon(tipo) {
-    const icons = { mensaje: 'fa-comment', solicitud_amistad: 'fa-user-plus', comentario: 'fa-comment-dots', like: 'fa-heart', story: 'fa-circle' };
+    const icons = { mensaje: 'fa-comment', solicitud_amistad: 'fa-user-plus', comentario: 'fa-comment-dots', like: 'fa-heart', story: 'fa-circle', compartir: 'fa-share' };
     return icons[tipo] || 'fa-bell';
 }
 
 function getNotifColor(tipo) {
-    const colors = { mensaje: 'mensaje', solicitud_amistad: 'amistad', comentario: 'comentario', like: 'like', story: 'mensaje' };
+    const colors = { mensaje: 'mensaje', solicitud_amistad: 'amistad', comentario: 'comentario', like: 'like', story: 'mensaje', compartir: 'comentario' };
     return colors[tipo] || 'mensaje';
 }
 
@@ -826,8 +868,15 @@ function formatTimeAgo(dateStr) {
 
 async function handleNotifClick(id, tipo, entidadId) {
     await fetch(`${BASE_URL}/api/notificaciones/marcar-leida/${id}`, { method: 'POST' });
-    if (tipo === 'mensaje' || tipo === 'solicitud_amistad') {
+    if (tipo === 'mensaje') {
+        window.location.href = 'mensajes.html';
+    } else if (tipo === 'solicitud_amistad') {
+        cargarNotificaciones();
+    } else if (tipo === 'comentario' || tipo === 'like') {
         cerrarNotificaciones();
+    }
+    actualizarNotificaciones();
+}
     }
     cargarNotificaciones();
 }
