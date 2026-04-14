@@ -74,7 +74,7 @@ public class UserController {
     }
 
     @PostMapping("/{id}/upload-foto")
-    public ResponseEntity<String> uploadFoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> uploadFoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) return ResponseEntity.badRequest().body("Archivo vacío");
 
         try {
@@ -82,17 +82,23 @@ public class UserController {
             if (userOpt.isEmpty()) return ResponseEntity.status(404).body("Usuario no encontrado");
 
             User user = userOpt.get();
-            String extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
-            String nombreArchivo = "foto_" + id + extension;
 
-            Path ruta = Paths.get("uploads").resolve(nombreArchivo);
+            Path uploadsDir = Paths.get("uploads");
+            if (!Files.exists(uploadsDir)) {
+                Files.createDirectories(uploadsDir);
+            }
+
+            String extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+            String nombreArchivo = "foto_" + id + "_" + System.currentTimeMillis() + extension;
+
+            Path ruta = uploadsDir.resolve(nombreArchivo);
             Files.copy(file.getInputStream(), ruta, StandardCopyOption.REPLACE_EXISTING);
 
             user.setFotoPerfil(nombreArchivo);
             userRepository.save(user);
 
             return ResponseEntity.ok(nombreArchivo);
-        } catch (IOException e) {
+        } catch (Exception e) {
             return ResponseEntity.status(500).body("Error al guardar la imagen: " + e.getMessage());
         }
     }
