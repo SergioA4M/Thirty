@@ -42,13 +42,13 @@ public class User {
     private String zonasMarcha;   // Ej: "Ocho y medio, Madrid"
     // ----------------------------
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "amistades",
             joinColumns = @JoinColumn(name = "usuario_id"),
             inverseJoinColumns = @JoinColumn(name = "amigo_id")
     )
-    @JsonIgnore // Mantenemos este para evitar el bucle infinito de amigos
+    @JsonIgnore
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<User> amigos = new HashSet<>();

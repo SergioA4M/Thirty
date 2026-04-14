@@ -97,9 +97,9 @@ public class UserController {
             user.setFotoPerfil(nombreArchivo);
             userRepository.save(user);
 
-            return ResponseEntity.ok(nombreArchivo);
+            return ResponseEntity.ok(Map.of("url", nombreArchivo));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error al guardar la imagen: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
     }
 

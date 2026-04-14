@@ -58,17 +58,28 @@ public class StoryController {
 
     @GetMapping("/feed/{usuarioId}")
     public ResponseEntity<List<Story>> obtenerFeed(@PathVariable Long usuarioId) {
-        User usuario = userRepository.findById(usuarioId)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        try {
+            User usuario = userRepository.findById(usuarioId).orElse(null);
+            if (usuario == null) {
+                return ResponseEntity.ok(List.of());
+            }
 
-        LocalDateTime ahora = LocalDateTime.now();
-        List<Long> amigoIds = usuario.getAmigos().stream()
-            .map(User::getId)
-            .toList();
-        amigoIds.add(usuarioId);
+            LocalDateTime ahora = LocalDateTime.now();
+            List<Long> amigoIds;
+            if (usuario.getAmigos() != null && !usuario.getAmigos().isEmpty()) {
+                amigoIds = usuario.getAmigos().stream()
+                    .map(User::getId)
+                    .toList();
+            } else {
+                amigoIds = List.of();
+            }
+            amigoIds.add(usuarioId);
 
-        List<Story> stories = storyRepository.findStoriesDeAmigos(amigoIds, ahora);
-        return ResponseEntity.ok(stories);
+            List<Story> stories = storyRepository.findStoriesDeAmigos(amigoIds, ahora);
+            return ResponseEntity.ok(stories);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(List.of());
+        }
     }
 
     @GetMapping("/mis-stories/{usuarioId}")

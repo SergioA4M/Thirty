@@ -191,22 +191,28 @@ function renderizarUsuarios() {
 
 async function agregarAmigo(userId, boton) {
     boton.disabled = true;
-    boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+    boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Añadiendo...';
     
     try {
-        const resp = await fetch(`${BASE_URL}/api/users/${miId}/solicitar-amistad/${userId}`, {
+        const resp = await fetch(`${BASE_URL}/api/users/${miId}/agregar/${userId}`, {
             method: 'POST'
         });
         
         if (resp.ok) {
             boton.className = 'btn btn-success';
-            boton.innerHTML = '<i class="fas fa-check"></i> Solicitud enviada';
+            boton.innerHTML = '<i class="fas fa-check"></i> Amigos';
+            boton.onclick = null;
             
             misAmigos.push({ id: userId });
+            
+            setTimeout(() => {
+                renderizarUsuarios();
+            }, 1000);
         } else {
+            const error = await resp.text();
             boton.disabled = false;
             boton.innerHTML = '<i class="fas fa-user-plus"></i> Añadir';
-            alert('Error al enviar solicitud');
+            alert('Error: ' + error);
         }
     } catch(e) {
         boton.disabled = false;
