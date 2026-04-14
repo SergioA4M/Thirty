@@ -43,18 +43,23 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
         try {
-            if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
+            System.out.println("Intentando registrar usuario: " + user.getEmail());
+            
+            if (user.getFirstName() == null || user.getFirstName().trim().isEmpty()) {
                 return ResponseEntity.badRequest().body("El nombre es obligatorio");
             }
-            if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
                 return ResponseEntity.badRequest().body("El email es obligatorio");
             }
             if (user.getPasswordHash() == null || user.getPasswordHash().isEmpty()) {
                 return ResponseEntity.badRequest().body("La contraseña es obligatoria");
             }
-            user.setCreatedAt(LocalDateTime.now());
-            return ResponseEntity.ok(userRepository.save(user));
+            
+            User saved = userRepository.save(user);
+            System.out.println("Usuario registrado: " + saved.getId());
+            return ResponseEntity.ok(saved);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(500).body("Error al registrar: " + e.getMessage());
         }
     }
