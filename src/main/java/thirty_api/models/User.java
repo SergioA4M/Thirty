@@ -55,4 +55,10 @@ public class User {
     private Set<User> amigos = new HashSet<>();
 
     private LocalDateTime createdAt = LocalDateTime.now();
+    
+    private boolean online = false;
+    private LocalDateTime lastSeen;
+    
+    @Column(columnDefinition = "TEXT")
+    private String espacioPersonal;
 }

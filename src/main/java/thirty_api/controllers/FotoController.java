@@ -15,29 +15,36 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/fotos")
-@CrossOrigin("*")
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.OPTIONS}, allowedHeaders = "*")
 public class FotoController {
 
     @Autowired private FotoRepository fotoRepository;
     @Autowired private UserRepository userRepository;
 
     @PostMapping("/upload/{userId}")
-    public Foto subirFoto(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<?> subirFoto(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
         try {
-            User user = userRepository.findById(userId).get();
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) {
+                return ResponseEntity.status(404).body("Usuario no encontrado");
+            }
 
-            // Nombre único para que no se machaquen fotos con el mismo nombre
+            Path uploadsDir = Paths.get("uploads");
+            if (!Files.exists(uploadsDir)) {
+                Files.createDirectories(uploadsDir);
+            }
+
             String nombreArchivo = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path ruta = Paths.get("uploads").resolve(nombreArchivo);
+            Path ruta = uploadsDir.resolve(nombreArchivo);
             Files.copy(file.getInputStream(), ruta, StandardCopyOption.REPLACE_EXISTING);
 
             Foto foto = new Foto();
             foto.setUrl(nombreArchivo);
             foto.setUsuario(user);
-            return fotoRepository.save(foto);
+            return ResponseEntity.ok(fotoRepository.save(foto));
 
         } catch (Exception e) {
-            return null;
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
 

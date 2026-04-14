@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Thirty - Mensajes</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👥</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { background-color: #e9eff4; font-family: 'Segoe UI', sans-serif; margin: 0; }
+        
+        header { background: linear-gradient(to bottom, #4c66a4 0%, #3b5998 100%); border-bottom: 1px solid #2d4373; color: white; padding: 0 15%; height: 42px; display: flex; align-items: center; font-size: 12px; font-weight: bold; position: sticky; top: 0; z-index: 100; }
+        .nav-item { padding: 0 12px; height: 100%; display: flex; align-items: center; cursor: pointer; border-right: 1px solid rgba(255,255,255,0.1); text-decoration: none; color: white; }
+        .nav-item:hover { background-color: rgba(0,0,0,0.1); }
+        .nav-active { background-color: #2d4373; }
+        
+        .main-container { display: grid; grid-template-columns: 300px 1fr; gap: 0; height: calc(100vh - 42px); max-width: 1400px; margin: 0 auto; }
+        
+        /* Lista de conversaciones */
+        .conversations-list { background: white; border-right: 1px solid #ddd; overflow-y: auto; }
+        .conversations-header { padding: 15px; border-bottom: 1px solid #eee; font-size: 18px; font-weight: bold; color: #3b5998; display: flex; align-items: center; gap: 10px; }
+        .search-box { padding: 10px 15px; border-bottom: 1px solid #eee; }
+        .search-box input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 20px; font-family: inherit; }
+        .search-box input:focus { outline: none; border-color: #3b5998; }
+        
+        .conversation-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f5f5f5; transition: background 0.2s; }
+        .conversation-item:hover { background: #f8f9fa; }
+        .conversation-item.active { background: #e8f4fc; border-left: 3px solid #3b5998; }
+        .conversation-item.unread { background: #f0f8ff; }
+        .conv-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; position: relative; flex-shrink: 0; }
+        .conv-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .online-dot { width: 12px; height: 12px; background: #2ecc71; border-radius: 50%; position: absolute; bottom: 0; right: 0; border: 2px solid white; }
+        .online-dot.offline { background: #95a5a6; }
+        .conv-info { flex: 1; min-width: 0; }
+        .conv-name { font-weight: bold; color: #333; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .conv-time { font-size: 11px; color: #999; font-weight: normal; }
+        .conv-preview { font-size: 13px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+        .conv-unread-badge { background: #3b5998; color: white; font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+        
+        /* Área de chat */
+        .chat-area { display: flex; flex-direction: column; background: #f0f2f5; }
+        .chat-header-area { background: white; padding: 15px 20px; border-bottom: 1px solid #ddd; display: flex; align-items: center; gap: 15px; }
+        .chat-user-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .chat-user-info h3 { margin: 0; font-size: 16px; color: #333; }
+        .chat-user-info span { font-size: 12px; color: #27ae60; }
+        .chat-user-info span.offline { color: #999; }
+        .chat-user-actions { margin-left: auto; display: flex; gap: 10px; }
+        .chat-action-btn { background: none; border: none; font-size: 18px; color: #666; cursor: pointer; padding: 8px; border-radius: 50%; }
+        .chat-action-btn:hover { background: #f0f2f5; }
+        
+        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        
+        .message { max-width: 70%; display: flex; flex-direction: column; }
+        .message.sent { align-self: flex-end; align-items: flex-end; }
+        .message.received { align-self: flex-start; align-items: flex-start; }
+        
+        .message-bubble { padding: 10px 15px; border-radius: 18px; word-wrap: break-word; max-width: 100%; }
+        .message.sent .message-bubble { background: #dcf8c6; border-bottom-right-radius: 4px; }
+        .message.received .message-bubble { background: white; border-bottom-left-radius: 4px; }
+        .message-bubble img { max-width: 250px; border-radius: 8px; display: block; margin-top: 5px; }
+        .message-time { font-size: 10px; color: #999; margin-top: 3px; padding: 0 5px; }
+        
+        .chat-input-area { background: white; padding: 15px 20px; border-top: 1px solid #ddd; display: flex; gap: 10px; align-items: center; }
+        .chat-input-actions { display: flex; gap: 5px; }
+        .chat-input-btn { background: none; border: none; font-size: 22px; cursor: pointer; padding: 8px; border-radius: 50%; color: #666; }
+        .chat-input-btn:hover { background: #f0f2f5; }
+        .chat-input { flex: 1; border: 1px solid #ddd; border-radius: 25px; padding: 10px 20px; font-family: inherit; font-size: 14px; }
+        .chat-input:focus { outline: none; border-color: #3b5998; }
+        .chat-send-btn { background: #3b5998; color: white; border: none; border-radius: 50%; width: 45px; height: 45px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .chat-send-btn:hover { background: #2d4373; }
+        
+        /* Emoji picker */
+        .emoji-picker { position: absolute; background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); padding: 15px; z-index: 200; display: none; bottom: 70px; left: 20px; }
+        .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; }
+        .emoji-item { font-size: 24px; cursor: pointer; padding: 5px; border-radius: 5px; }
+        .emoji-item:hover { background: #f0f2f5; }
+        
+        /* Stickers panel */
+        .stickers-panel { position: absolute; background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); padding: 15px; z-index: 200; display: none; bottom: 70px; left: 70px; width: 300px; }
+        .stickers-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .sticker-item { font-size: 32px; cursor: pointer; text-align: center; padding: 5px; border-radius: 8px; }
+        .sticker-item:hover { background: #f0f2f5; }
+        
+        /* Placeholder */
+        .chat-placeholder { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; text-align: center; padding: 40px; }
+        .chat-placeholder i { font-size: 80px; margin-bottom: 20px; opacity: 0.3; }
+        .chat-placeholder h2 { margin: 0 0 10px 0; color: #666; }
+        .chat-placeholder p { margin: 0; font-size: 14px; }
+        
+        /* Hidden */
+        .hidden { display: none !important; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-size: 20px; margin-right: 20px;">thirty</div>
+    <a href="home.html" class="nav-item">Inicio</a>
+    <a href="perfil.html" class="nav-item">Perfil</a>
+    <a href="mensajes.html" class="nav-item nav-active">Mensajes</a>
+    <a href="gente.html" class="nav-item">Gente</a>
+    <div style="margin-left: auto; display: flex; height: 100%;">
+        <a href="#" class="nav-item">Mi cuenta</a>
+        <a href="login.html" onclick="cerrarSesion()" class="nav-item">Salir</a>
+    </div>
+</header>
+
+<div class="main-container">
+    <!-- Lista de conversaciones -->
+    <div class="conversations-list">
+        <div class="conversations-header">
+            <i class="fas fa-comments"></i> Mensajes
+        </div>
+        <div class="search-box">
+            <input type="text" id="searchConversations" placeholder="Buscar conversación..." oninput="filtrarConversaciones()">
+        </div>
+        <div id="conversationsList"></div>
+    </div>
+    
+    <!-- Área de chat -->
+    <div class="chat-area" id="chatArea">
+        <div class="chat-placeholder" id="chatPlaceholder">
+            <i class="fas fa-comment-dots"></i>
+            <h2>Selecciona una conversación</h2>
+            <p>Elige un amigo para empezar a chatear</p>
+        </div>
+        
+        <div id="chatContent" class="hidden">
+            <div class="chat-header-area">
+                <img id="chatAvatar" src="" class="chat-user-avatar">
+                <div class="chat-user-info">
+                    <h3 id="chatName"></h3>
+                    <span id="chatStatus"></span>
+                </div>
+                <div class="chat-user-actions">
+                    <button class="chat-action-btn" title="Videollamada"><i class="fas fa-video"></i></button>
+                    <button class="chat-action-btn" title="Información"><i class="fas fa-info-circle"></i></button>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages"></div>
+            
+            <div class="chat-input-area">
+                <div class="chat-input-actions">
+                    <button class="chat-input-btn" onclick="toggleEmoji()" title="Emoji">😊</button>
+                    <button class="chat-input-btn" onclick="toggleStickers()" title="Stickers">😎</button>
+                    <button class="chat-input-btn" onclick="document.getElementById('fileInput').click()" title="Adjuntar archivo"><i class="fas fa-paperclip"></i></button>
+                    <input type="file" id="fileInput" class="hidden" accept="image/*" onchange="enviarArchivo(event)">
+                </div>
+                <input type="text" id="messageInput" class="chat-input" placeholder="Escribe un mensaje..." onkeypress="if(event.key==='Enter')enviarMensaje()">
+                <button class="chat-send-btn" onclick="enviarMensaje()" title="Enviar"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            
+            <div class="emoji-picker" id="emojiPicker">
+                <div class="emoji-grid" id="emojiGrid"></div>
+            </div>
+            
+            <div class="stickers-panel" id="stickersPanel">
+                <h5 style="margin:0 0 10px 0;color:#666;">Stickers</h5>
+                <div class="stickers-grid" id="stickersGrid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const BASE_URL = 'https://thirty-poqp.onrender.com';
+const miId = localStorage.getItem('usuarioID');
+const miNombre = localStorage.getItem('usuarioNombre');
+
+let conversaciones = [];
+let conversacionActual = null;
+letultimoMensajeId = 0;
+
+const EMOJIS = ['😀','😂','😍','🥰','😊','😎','🤔','😅','😭','🤩','😇','🥳','😋','🤗','😜','🤫','😤','🥺','🙏','👋','❤️','🔥','✨','🌟','💯','🎉','💪','👍','👏','🙌'];
+const STICKERS = ['😀','😂','🥰','😍','😊','😎','🤩','🥳','😜','🤗','😭','🥺','😤','😇','🤔','😅','❤️','🔥','✨','💯','🎉','💪','👍','👎','👏','🙌','🤝','👋','🙏','💋'];
+
+function initEmojiGrid() {
+    const grid = document.getElementById('emojiGrid');
+    EMOJIS.forEach(e => {
+        const span = document.createElement('span');
+        span.className = 'emoji-item';
+        span.textContent = e;
+        span.onclick = () => insertarEmoji(e);
+        grid.appendChild(span);
+    });
+}
+
+function initStickersGrid() {
+    const grid = document.getElementById('stickersGrid');
+    STICKERS.forEach(s => {
+        const span = document.createElement('span');
+        span.className = 'sticker-item';
+        span.textContent = s;
+        span.onclick = () => enviarSticker(s);
+        grid.appendChild(span);
+    });
+}
+
+function toggleEmoji() {
+    document.getElementById('emojiPicker').style.display = document.getElementById('emojiPicker').style.display === 'block' ? 'none' : 'block';
+    document.getElementById('stickersPanel').style.display = 'none';
+}
+
+function toggleStickers() {
+    document.getElementById('stickersPanel').style.display = document.getElementById('stickersPanel').style.display === 'block' ? 'none' : 'block';
+    document.getElementById('emojiPicker').style.display = 'none';
+}
+
+function insertarEmoji(e) {
+    document.getElementById('messageInput').value += e;
+    document.getElementById('emojiPicker').style.display = 'none';
+    document.getElementById('messageInput').focus();
+}
+
+function enviarSticker(s) {
+    if (!conversacionActual) return;
+    enviarContenido(s);
+    document.getElementById('stickersPanel').style.display = 'none';
+}
+
+window.onload = async () => {
+    if (!miId) { window.location.href = "login.html"; return; }
+    
+    initEmojiGrid();
+    initStickersGrid();
+    
+    await cargarConversaciones();
+    setInterval(actualizarConversaciones, 5000);
+    
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#emojiPicker') && !e.target.closest('.chat-input-btn')) {
+            document.getElementById('emojiPicker').style.display = 'none';
+        }
+        if (!e.target.closest('#stickersPanel') && !e.target.closest('.chat-input-btn')) {
+            document.getElementById('stickersPanel').style.display = 'none';
+        }
+    });
+};
+
+async function cargarConversaciones() {
+    try {
+        const resp = await fetch(`${BASE_URL}/api/users/amigos/estado/${miId}`);
+        const amigos = await resp.json();
+        
+        conversaciones = [];
+        
+        for (const amigo of amigos) {
+            try {
+                const histResp = await fetch(`${BASE_URL}/api/mensajes/historial/${miId}/${amigo.id}`);
+                const mensajes = await histResp.json();
+                
+                const noLeidos = mensajes.filter(m => !m.leido && m.emisor.id == amigo.id).length;
+                const ultimo = mensajes[mensajes.length - 1];
+                
+                conversaciones.push({
+                    id: amigo.id,
+                    nombre: amigo.firstName,
+                    foto: amigo.fotoPerfil,
+                    online: amigo.online,
+                    ultimoMensaje: ultimo?.contenido || '',
+                    ultimoTiempo: ultimo?.fechaEnvio,
+                    noLeidos: noLeidos
+                });
+            } catch(e) {}
+        }
+        
+        conversaciones.sort((a, b) => new Date(b.ultimoTiempo || 0) - new Date(a.ultimoTiempo || 0));
+        renderizarConversaciones();
+    } catch(e) { console.error(e); }
+}
+
+function renderizarConversaciones() {
+    const lista = document.getElementById('conversationsList');
+    
+    if (conversaciones.length === 0) {
+        lista.innerHTML = '<div style="padding:30px;text-align:center;color:#999;">No tienes conversaciones</div>';
+        return;
+    }
+    
+    lista.innerHTML = conversaciones.map(c => {
+        const foto = c.foto ? `${BASE_URL}/uploads/${c.foto}` : `https://ui-avatars.com/api/?name=${c.nombre}&background=3b5998&color=fff&size=64`;
+        const onlineClass = c.online ? '' : 'offline';
+        const activeClass = conversacionActual === c.id ? 'active' : '';
+        const unreadClass = c.noLeidos > 0 ? 'unread' : '';
+        const preview = c.ultimoMensaje.length > 40 ? c.ultimoMensaje.substring(0, 40) + '...' : c.ultimoMensaje;
+        const tiempo = c.ultimoTiempo ? formatTime(c.ultimoTiempo) : '';
+        const badge = c.noLeidos > 0 ? `<span class="conv-unread-badge">${c.noLeidos}</span>` : '';
+        
+        return `<div class="conversation-item ${activeClass} ${unreadClass}" onclick="abrirConversacion(${c.id}, '${c.nombre}', '${c.foto}', ${c.online})">
+            <div class="conv-avatar">
+                <img src="${foto}">
+                <div class="online-dot ${onlineClass}"></div>
+            </div>
+            <div class="conv-info">
+                <div class="conv-name">${c.nombre} <span class="conv-time">${tiempo}</span></div>
+                <div class="conv-preview">${preview} ${badge}</div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function filtrarConversaciones() {
+    const query = document.getElementById('searchConversations').value.toLowerCase();
+    const items = document.querySelectorAll('.conversation-item');
+    items.forEach((item, i) => {
+        const nombre = conversaciones[i]?.nombre.toLowerCase() || '';
+        item.style.display = nombre.includes(query) ? 'flex' : 'none';
+    });
+}
+
+async function abrirConversacion(id, nombre, foto, online) {
+    conversacionActual = id;
+    conversacionActualNombre = nombre;
+    
+    document.getElementById('chatPlaceholder').classList.add('hidden');
+    document.getElementById('chatContent').classList.remove('hidden');
+    
+    const fotoUrl = foto ? `${BASE_URL}/uploads/${foto}` : `https://ui-avatars.com/api/?name=${nombre}&background=3b5998&color=fff&size=64`;
+    document.getElementById('chatAvatar').src = fotoUrl;
+    document.getElementById('chatName').textContent = nombre;
+    document.getElementById('chatStatus').textContent = online ? 'En línea' : 'Desconectado';
+    document.getElementById('chatStatus').className = online ? '' : 'offline';
+    
+    await cargarMensajes();
+    renderizarConversaciones();
+    
+    setInterval(async () => {
+        if (conversacionActual) await cargarMensajes(true);
+    }, 3000);
+}
+
+async function cargarMensajes(silent = false) {
+    if (!conversacionActual) return;
+    
+    try {
+        const resp = await fetch(`${BASE_URL}/api/mensajes/historial/${miId}/${conversacionActual}`);
+        const mensajes = await resp.json();
+        
+        await fetch(`${BASE_URL}/api/mensajes/marcar-leidos/${miId}/${conversacionActual}`, { method: 'POST' });
+        
+        const contenedor = document.getElementById('chatMessages');
+        contenedor.innerHTML = mensajes.map(m => {
+            const esMio = m.emisor.id == miId;
+            const clase = esMio ? 'sent' : 'received';
+            let contenido = m.contenido;
+            
+            if (contenido.startsWith('/uploads/')) {
+                contenido = `<img src="${BASE_URL}${contenido}">`;
+            }
+            
+            return `<div class="message ${clase}">
+                <div class="message-bubble">${contenido}</div>
+                <div class="message-time">${new Date(m.fechaEnvio).toLocaleTimeString()}</div>
+            </div>`;
+        }).join('');
+        
+        contenedor.scrollTop = contenedor.scrollHeight;
+        
+        if (!silent) {
+           ultimoMensajeId = mensajes[mensajes.length - 1]?.id || 0;
+        }
+    } catch(e) {}
+}
+
+async function enviarMensaje() {
+    const input = document.getElementById('messageInput');
+    const texto = input.value.trim();
+    if (!texto || !conversacionActual) return;
+    
+    await enviarContenido(texto);
+    input.value = '';
+}
+
+async function enviarContenido(texto) {
+    if (!conversacionActual) return;
+    
+    try {
+        await fetch(`${BASE_URL}/api/mensajes/enviar?emisorId=${miId}&receptorId=${conversacionActual}`, {
+            method: 'POST',
+            body: texto
+        });
+        
+        await cargarMensajes();
+        await cargarConversaciones();
+    } catch(e) { console.error(e); }
+}
+
+async function enviarArchivo(event) {
+    const file = event.target.files[0];
+    if (!file || !conversacionActual) return;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        const resp = await fetch(`${BASE_URL}/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
+        if (resp.ok) {
+            const data = await resp.json();
+            await enviarContenido(`/uploads/${data.url}`);
+        }
+    } catch(e) { console.error(e); }
+    
+    event.target.value = '';
+}
+
+function formatTime(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = (now - date) / 1000;
+    
+    if (diff < 60) return 'Ahora';
+    if (diff < 3600) return `${Math.floor(diff/60)}m`;
+    if (diff < 86400) return date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    return date.toLocaleDateString();
+}
+
+async function actualizarConversaciones() {
+    await cargarConversaciones();
+}
+
+function cerrarSesion() {
+    fetch(`${BASE_URL}/api/users/set-offline/${miId}`, { method: 'POST' });
+    localStorage.clear();
+}
+
+window.cerrarSesion = cerrarSesion;
+</script>
+</body>
+</html>
