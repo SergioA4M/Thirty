@@ -139,6 +139,19 @@ public class UserController {
         return ResponseEntity.ok(usuario.getAmigos());
     }
 
+    @DeleteMapping("/{id}/amigos/{amigoId}")
+    public ResponseEntity<?> eliminarAmigo(@PathVariable Long id, @PathVariable Long amigoId) {
+        User usuario = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        User amigo = userRepository.findById(amigoId).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        usuario.getAmigos().remove(amigo);
+        amigo.getAmigos().remove(usuario);
+        userRepository.save(usuario);
+        userRepository.save(amigo);
+
+        return ResponseEntity.ok("Amigo eliminado");
+    }
+
     @PutMapping("/{id}/perfil")
     public ResponseEntity<User> actualizarPerfil(@PathVariable Long id, @RequestBody User datos) {
         return userRepository.findById(id).map(user -> {

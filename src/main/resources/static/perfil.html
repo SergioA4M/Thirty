@@ -606,6 +606,7 @@ function cerrarLightbox() {
 function cerrarSesion() {
     fetch(`${BASE_URL}/api/users/set-offline/${miId}`, { method: 'POST' });
     localStorage.clear();
+    window.location.href = 'login.html';
 }
 
 window.eliminarTablon = eliminarTablon;

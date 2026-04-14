@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta id="og-title" property="og:title" content="Post en Thirty">
+    <meta id="og-description" property="og:description" content="Mira esta publicación en Thirty">
+    <meta id="og-image" property="og:image" content="https://ui-avatars.com/api/?name=Thirty&background=3b5998&color=fff&size=200">
+    <meta id="og-url" property="og:url" content="">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Thirty">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twitter-title" content="Post en Thirty">
+    <meta name="twitter:description" id="twitter-desc" content="Mira esta publicación en Thirty">
+    <meta name="twitter:image" id="twitter-image" content="https://ui-avatars.com/api/?name=Thirty&background=3b5998&color=fff&size=200">
+    
+    <title>Post - Thirty</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👥</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body { background-color: #e9eff4; font-family: 'Segoe UI', sans-serif; margin: 0; }
+        
+        header { background: linear-gradient(to bottom, #4c66a4 0%, #3b5998 100%); border-bottom: 1px solid #2d4373; color: white; padding: 0 15%; height: 42px; display: flex; align-items: center; font-size: 12px; font-weight: bold; position: sticky; top: 0; z-index: 100; }
+        .nav-item { padding: 0 12px; height: 100%; display: flex; align-items: center; cursor: pointer; border-right: 1px solid rgba(255,255,255,0.1); text-decoration: none; color: white; }
+        .nav-item:hover { background-color: rgba(0,0,0,0.1); }
+        
+        .main-container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        
+        .post-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 20px; }
+        .post-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .post-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .post-author { font-weight: bold; color: #3b5998; font-size: 16px; }
+        .post-time { font-size: 12px; color: #999; }
+        .post-content { font-size: 15px; line-height: 1.6; color: #333; margin-bottom: 15px; }
+        .post-content img { max-width: 100%; border-radius: 8px; margin-top: 10px; }
+        .post-actions { display: flex; gap: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        .action-btn { color: #666; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 14px; }
+        .action-btn:hover { color: #3b5998; }
+        .action-btn.liked { color: #e74c3c; }
+        
+        .back-link { color: #3b5998; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 14px; }
+        .back-link:hover { text-decoration: underline; }
+        
+        .loading { text-align: center; padding: 50px; color: #666; }
+        .error { text-align: center; padding: 50px; color: #e74c3c; }
+        
+        .share-section { background: white; padding: 20px; border-radius: 12px; border: 1px solid #ddd; text-align: center; }
+        .share-title { font-size: 16px; color: #333; margin-bottom: 15px; }
+        .share-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .share-btn { padding: 12px 25px; border-radius: 25px; color: white; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .share-btn:hover { opacity: 0.9; }
+        .share-btn.twitter { background: #1DA1F2; }
+        .share-btn.facebook { background: #1877F2; }
+        .share-btn.whatsapp { background: #25D366; }
+        .share-btn.linkedin { background: #0A66C2; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-size: 20px; margin-right: 20px;">thirty</div>
+    <a href="home.html" class="nav-item">Inicio</a>
+    <a href="perfil.html" class="nav-item">Perfil</a>
+    <a href="mensajes.html" class="nav-item">Mensajes</a>
+    <a href="gente.html" class="nav-item">Gente</a>
+</header>
+
+<div class="main-container">
+    <a href="home.html" class="back-link"><i class="fas fa-arrow-left"></i> Volver al inicio</a>
+    
+    <div id="post-container">
+        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+    </div>
+    
+    <div class="share-section" id="share-section" style="display:none;">
+        <h3 class="share-title">Compartir en redes sociales</h3>
+        <div class="share-buttons">
+            <a id="share-twitter" href="#" class="share-btn twitter" target="_blank">
+                <i class="fab fa-x-twitter"></i> X (Twitter)
+            </a>
+            <a id="share-facebook" href="#" class="share-btn facebook" target="_blank">
+                <i class="fab fa-facebook"></i> Facebook
+            </a>
+            <a id="share-whatsapp" href="#" class="share-btn whatsapp" target="_blank">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </a>
+            <a id="share-linkedin" href="#" class="share-btn linkedin" target="_blank">
+                <i class="fab fa-linkedin"></i> LinkedIn
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+const BASE_URL = 'https://thirty-poqp.onrender.com';
+
+function parsearContenido(texto) {
+    if (!texto) return "";
+    let contenido = texto;
+    const imgRegex = /\/uploads\/[^\s<>"]+/gi;
+    contenido = contenido.replace(imgRegex, (match) => `<img src="${BASE_URL}${match}" style="max-width:100%;border-radius:8px;display:block;margin-top:10px;">`);
+    const ytRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/gi;
+    contenido = contenido.replace(ytRegex, '<div style="margin:10px 0;position:relative;padding-bottom:56.25%;height:0;overflow:hidden;"><iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:8px;" src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>');
+    
+    const urls = texto.match(/(?:https?:\/\/)?(?:www\.)?[^\s]+/gi);
+    if (urls) {
+        urls.forEach(url => {
+            if (url.startsWith('http') && !url.includes('youtube.com') && !url.includes('youtu.be') && !url.includes('/uploads/')) {
+                const cleanUrl = url.startsWith('http') ? url : 'https://' + url;
+                contenido = contenido.replace(url, `<a href="${cleanUrl}" target="_blank" rel="noopener" style="color:#3b5998;">${url}</a>`);
+            }
+        });
+    }
+    return contenido;
+}
+
+async function cargarPost() {
+    const params = new URLSearchParams(window.location.search);
+    const postId = params.get('id');
+    
+    if (!postId) {
+        document.getElementById('post-container').innerHTML = '<div class="error">No se especificó ningún post</div>';
+        return;
+    }
+    
+    try {
+        const r = await fetch(`${BASE_URL}/api/posts/${postId}`);
+        
+        if (!r.ok) {
+            document.getElementById('post-container').innerHTML = '<div class="error">Post no encontrado</div>';
+            return;
+        }
+        
+        const p = await r.json();
+        
+        const postUrl = `${window.location.origin}${window.location.pathname}?id=${p.id}`;
+        const shareText = encodeURIComponent(p.content ? p.content.substring(0, 200) : 'Mira esta publicación en Thirty');
+        
+        let ogImage = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(p.author || 'Post') + '&background=3b5998&color=fff&size=400';
+        if (p.content && p.content.includes('/uploads/')) {
+            const imgMatch = p.content.match(/\/uploads\/[^\s<>"]+/);
+            if (imgMatch) {
+                ogImage = `${BASE_URL}${imgMatch[0]}`;
+            }
+        }
+        
+        document.getElementById('og-title').content = `${p.author} - Thirty`;
+        document.getElementById('og-description').content = p.content ? p.content.substring(0, 200) : 'Mira esta publicación en Thirty';
+        document.getElementById('og-image').content = ogImage;
+        document.getElementById('og-url').content = postUrl;
+        
+        document.getElementById('twitter-title').content = `${p.author} - Thirty`;
+        document.getElementById('twitter-desc').content = p.content ? p.content.substring(0, 200) : 'Mira esta publicación en Thirty';
+        document.getElementById('twitter-image').content = ogImage;
+        
+        document.title = `${p.author} - Thirty`;
+        
+        const avatar = p.fotoAutor ? `${BASE_URL}/uploads/${p.fotoAutor}` : `https://ui-avatars.com/api/?name=${p.author || 'U'}&background=3b5998&color=fff&size=100`;
+        
+        let countLikes = 0;
+        try {
+            const countRes = await fetch(`${BASE_URL}/api/likes/count/post/${p.id}`);
+            countLikes = await countRes.json();
+        } catch(e) {}
+        
+        document.getElementById('post-container').innerHTML = `
+            <div class="post-card">
+                <div class="post-header">
+                    <img src="${avatar}" class="post-avatar">
+                    <div>
+                        <div class="post-author">${p.author || 'Usuario'}</div>
+                        <div class="post-time">${new Date(p.createdAt).toLocaleString()}</div>
+                    </div>
+                </div>
+                <div class="post-content">${parsearContenido(p.content)}</div>
+                <div class="post-actions">
+                    <span class="action-btn"><i class="fas fa-heart"></i> ${countLikes} me gusta</span>
+                    <span class="action-btn"><i class="fas fa-comment"></i> Comentar</span>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('share-twitter').href = `https://twitter.com/intent/tweet?text=${shareText}&url=${encodeURIComponent(postUrl)}`;
+        document.getElementById('share-facebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
+        document.getElementById('share-whatsapp').href = `https://wa.me/?text=${shareText}%20${encodeURIComponent(postUrl)}`;
+        document.getElementById('share-linkedin').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(postUrl)}`;
+        
+        document.getElementById('share-section').style.display = 'block';
+        
+    } catch(e) {
+        document.getElementById('post-container').innerHTML = '<div class="error">Error al cargar el post</div>';
+    }
+}
+
+cargarPost();
+</script>
+</body>
+</html>

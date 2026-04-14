@@ -54,6 +54,8 @@
         .btn-secondary:hover { background: #e4e6eb; }
         .btn-success { background: #27ae60; color: white; }
         .btn-success:hover { background: #219a52; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
         .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         
         .online-indicator { display: inline-block; width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; margin-left: 5px; }
@@ -78,7 +80,7 @@
     <a href="gente.html" class="nav-item nav-active">Gente</a>
     <div style="margin-left: auto; display: flex; height: 100%;">
         <a href="#" class="nav-item">Mi cuenta</a>
-        <a href="login.html" onclick="localStorage.clear()" class="nav-item">Salir</a>
+        <a href="login.html" onclick="logout()" class="nav-item">Salir</a>
     </div>
 </header>
 
@@ -158,7 +160,7 @@ function renderizarUsuarios() {
         
         let btnEstado = '';
         if (esMiAmigo) {
-            btnEstado = `<button class="btn btn-success" disabled><i class="fas fa-check"></i> Amigos</button>`;
+            btnEstado = `<button class="btn btn-danger" onclick="eliminarAmigo(${u.id}, this)"><i class="fas fa-user-minus"></i> Borrar amigo</button>`;
         } else {
             btnEstado = `<button class="btn btn-primary" onclick="agregarAmigo(${u.id}, this)"><i class="fas fa-user-plus"></i> Añadir</button>`;
         }
@@ -176,7 +178,7 @@ function renderizarUsuarios() {
                     <p class="user-card-bio">${u.bio || 'Sin estado'}</p>
                     <div class="user-card-stats">
                         <div class="stat">
-                            <div class="stat-number">${misAmigos.filter(a => a.id === u.id).length > 0 ? misAmigos.length : '0'}</div>
+                            <div class="stat-number">${misAmigos.length}</div>
                             <div class="stat-label">Amigos</div>
                         </div>
                     </div>
@@ -199,15 +201,8 @@ async function agregarAmigo(userId, boton) {
         });
         
         if (resp.ok) {
-            boton.className = 'btn btn-success';
-            boton.innerHTML = '<i class="fas fa-check"></i> Amigos';
-            boton.onclick = null;
-            
             misAmigos.push({ id: userId });
-            
-            setTimeout(() => {
-                renderizarUsuarios();
-            }, 1000);
+            renderizarUsuarios();
         } else {
             const error = await resp.text();
             boton.disabled = false;
@@ -217,6 +212,32 @@ async function agregarAmigo(userId, boton) {
     } catch(e) {
         boton.disabled = false;
         boton.innerHTML = '<i class="fas fa-user-plus"></i> Añadir';
+        alert('Error de conexión');
+    }
+}
+
+async function eliminarAmigo(userId, boton) {
+    if (!confirm('¿Seguro que quieres eliminar a este amigo?')) return;
+    
+    boton.disabled = true;
+    boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>...';
+    
+    try {
+        const resp = await fetch(`${BASE_URL}/api/users/${miId}/amigos/${userId}`, {
+            method: 'DELETE'
+        });
+        
+        if (resp.ok) {
+            misAmigos = misAmigos.filter(a => a.id !== userId);
+            renderizarUsuarios();
+        } else {
+            boton.disabled = false;
+            boton.innerHTML = '<i class="fas fa-user-minus"></i> Borrar amigo';
+            alert('Error al eliminar amigo');
+        }
+    } catch(e) {
+        boton.disabled = false;
+        boton.innerHTML = '<i class="fas fa-user-minus"></i> Borrar amigo';
         alert('Error de conexión');
     }
 }
@@ -286,6 +307,11 @@ async function buscarUsuarios() {
                 </div>
             </div>`;
     }).join('');
+}
+
+function logout() {
+    fetch(`${BASE_URL}/api/users/set-offline/${miId}`, { method: 'POST' });
+    localStorage.clear();
 }
 </script>
 </body>
