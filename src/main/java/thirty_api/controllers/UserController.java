@@ -107,13 +107,24 @@ public class UserController {
         User usuario = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         User amigo = userRepository.findById(amigoId).orElseThrow(() -> new RuntimeException("Amigo no encontrado"));
 
+        if (usuario.getAmigos().contains(amigo)) {
+            return ResponseEntity.badRequest().body("Ya son amigos");
+        }
+
         usuario.getAmigos().add(amigo);
         amigo.getAmigos().add(usuario);
-
         userRepository.save(usuario);
         userRepository.save(amigo);
 
-        return ResponseEntity.ok("Conexión establecida");
+        Notificacion notif = new Notificacion();
+        notif.setUsuario(amigo);
+        notif.setEmisor(usuario);
+        notif.setTipo("solicitud_amistad");
+        notif.setContenido(usuario.getFirstName() + " y tú ahora son amigos");
+        notif.setEntidadId(id);
+        notificacionRepository.save(notif);
+
+        return ResponseEntity.ok("Amigo añadido");
     }
 
     @GetMapping("/{id}/amigos")
@@ -223,39 +234,7 @@ public class UserController {
         
         return ResponseEntity.ok(amigos);
     }
-
-    @PostMapping("/{id}/solicitar-amistad/{amigoId}")
-    public ResponseEntity<?> solicitarAmistad(@PathVariable Long id, @PathVariable Long amigoId) {
-        User usuario = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        User amigo = userRepository.findById(amigoId).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        if (usuario.getAmigos().contains(amigo)) {
-            return ResponseEntity.badRequest().body("Ya son amigos");
-        }
-
-        Notificacion notif = new Notificacion();
-        notif.setUsuario(amigo);
-        notif.setEmisor(usuario);
-        notif.setTipo("solicitud_amistad");
-        notif.setContenido(usuario.getFirstName() + " quiere ser tu amigo");
-        notif.setEntidadId(id);
-        notificacionRepository.save(notif);
-
-        return ResponseEntity.ok("Solicitud enviada");
-    }
-
-    @PostMapping("/{id}/aceptar-amistad/{amigoId}")
-    public ResponseEntity<?> aceptarAmistad(@PathVariable Long id, @PathVariable Long amigoId) {
-        User usuario = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        User amigo = userRepository.findById(amigoId).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        usuario.getAmigos().add(amigo);
-        amigo.getAmigos().add(usuario);
-        userRepository.save(usuario);
-        userRepository.save(amigo);
-
-        return ResponseEntity.ok("Amistad aceptada");
-    }
 }
+
 
 
