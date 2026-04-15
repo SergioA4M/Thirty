@@ -20,6 +20,7 @@ public class FotoController {
 
     @Autowired private FotoRepository fotoRepository;
     @Autowired private UserRepository userRepository;
+    @Autowired private thirty_api.services.SupabaseService supabaseService;
 
     @PostMapping("/upload/{userId}")
     public ResponseEntity<?> subirFoto(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
@@ -29,14 +30,10 @@ public class FotoController {
                 return ResponseEntity.status(404).body("Usuario no encontrado");
             }
 
-            Path uploadsDir = Paths.get("uploads");
-            if (!Files.exists(uploadsDir)) {
-                Files.createDirectories(uploadsDir);
-            }
-
             String nombreArchivo = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path ruta = uploadsDir.resolve(nombreArchivo);
-            Files.copy(file.getInputStream(), ruta, StandardCopyOption.REPLACE_EXISTING);
+            
+            // Subir a Supabase Storage
+            supabaseService.uploadFile(file.getBytes(), nombreArchivo, file.getContentType());
 
             Foto foto = new Foto();
             foto.setUrl(nombreArchivo);
@@ -44,6 +41,7 @@ public class FotoController {
             return ResponseEntity.ok(fotoRepository.save(foto));
 
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }

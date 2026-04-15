@@ -29,6 +29,9 @@ public class StoryController {
     @Autowired private UserRepository userRepository;
     @Autowired private NotificacionRepository notificacionRepository;
 
+    @Autowired
+    private thirty_api.services.SupabaseService supabaseService;
+
     @PostMapping("/crear/{usuarioId}")
     public ResponseEntity<?> crearStory(@PathVariable Long usuarioId, 
                                         @RequestParam("file") MultipartFile file,
@@ -41,8 +44,8 @@ public class StoryController {
                 .substring(file.getOriginalFilename().lastIndexOf("."));
             String nombreArchivo = "story_" + System.currentTimeMillis() + extension;
 
-            Path ruta = Paths.get("uploads").resolve(nombreArchivo);
-            Files.copy(file.getInputStream(), ruta, StandardCopyOption.REPLACE_EXISTING);
+            // Sube el archivo a tu Supabase Storage en vez de disco
+            supabaseService.uploadFile(file.getBytes(), nombreArchivo, file.getContentType());
 
             Story story = new Story();
             story.setUsuario(usuario);
@@ -52,6 +55,7 @@ public class StoryController {
 
             return ResponseEntity.ok(story);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
