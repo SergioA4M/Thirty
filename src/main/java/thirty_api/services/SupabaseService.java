@@ -15,10 +15,8 @@ public class SupabaseService {
     // Cambia esto por tu Project URL de Supabase
     private final String SUPABASE_URL = "https://ylxpcytucebvzijqyrsx.supabase.co";
     
-    // OJO: Tu key actual (sb_publishable_...) parece de otro servicio.
-    // Las keys de Supabase SIEMPRE empiezan por "eyJ".
-    // Si te da error de autorizaci\u00f3n al subir fotos, ve a Supabase -> Project Settings -> API y copia tu "anon public key".
-    private final String API_KEY = "sb_publishable_JzfCE0OJFsPuvfVxyiCGrQ_KP4Z7gcg";
+    // La key 'anon' pública de tu proyecto Supabase (Empieza por eyJ...)
+    private final String API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlseHBjeXR1Y2VidnppanF5cnN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MDUzNTAsImV4cCI6MjA5MTM4MTM1MH0.r9XQdT60WsoVX9NT5AOvEo6PP7Y2HeKr0TN8qKTMBz8";
 
     /**
      * Sube un archivo (byte[]) al bucket "uploads" de Supabase.
