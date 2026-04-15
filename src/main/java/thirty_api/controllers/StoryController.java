@@ -65,19 +65,19 @@ public class StoryController {
             }
 
             LocalDateTime ahora = LocalDateTime.now();
-            List<Long> amigoIds;
+            List<Long> amigoIds = new java.util.ArrayList<>();
             if (usuario.getAmigos() != null && !usuario.getAmigos().isEmpty()) {
-                amigoIds = usuario.getAmigos().stream()
+                amigoIds.addAll(usuario.getAmigos().stream()
                     .map(User::getId)
-                    .toList();
-            } else {
-                amigoIds = List.of();
+                    .toList());
             }
             amigoIds.add(usuarioId);
 
             List<Story> stories = storyRepository.findStoriesDeAmigos(amigoIds, ahora);
             return ResponseEntity.ok(stories);
         } catch (Exception e) {
+            System.err.println("Error en obtenerFeed: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(500).body(List.of());
         }
     }
