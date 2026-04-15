@@ -61,7 +61,7 @@ Si deseas clonar el proyecto y ejecutarlo en tu máquina local, sigue estos paso
    *(Si estás en Windows usa `mvnw.cmd spring-boot:run`)*
 
 4. **Abre la App:**
-   Navega a `http://localhost:8080/login.html` desde tu navegador.
+   Navega a `https://thirty-poqp.onrender.com/` desde tu navegador.
 
 ## 📸 Capturas de Pantalla
 
