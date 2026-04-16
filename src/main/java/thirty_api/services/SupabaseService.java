@@ -31,10 +31,10 @@ public class SupabaseService {
         headers.set("Authorization", "Bearer " + API_KEY);
         headers.set("apikey", API_KEY);
         
-        // Le decimos de qu\u00e9 tipo es el archivo (ej: image/png)
+        // Le decimos de qué tipo es el archivo (ej: image/png)
         headers.setContentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"));
 
-        // Preparamos la petici\u00f3n con el archivo y las credenciales
+        // Preparamos la petición con el archivo y las credenciales
         HttpEntity<byte[]> requestEntity = new HttpEntity<>(fileBytes, headers);
 
         try {
@@ -46,6 +46,27 @@ public class SupabaseService {
         } catch (HttpClientErrorException e) {
             System.err.println("Fallo al subir a Supabase: " + e.getResponseBodyAsString());
             throw new RuntimeException("Error subiendo a Supabase: " + e.getResponseBodyAsString());
+        }
+    }
+
+    /**
+     * Borra un archivo físicamente de Supabase Storage.
+     */
+    public void deleteFile(String filename) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            String url = SUPABASE_URL + "/storage/v1/object/uploads/" + filename;
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + API_KEY);
+            headers.set("apikey", API_KEY);
+
+            HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+            restTemplate.exchange(url, HttpMethod.DELETE, requestEntity, String.class);
+            System.out.println("Archivo " + filename + " borrado de Supabase exitosamente.");
+        } catch (Exception e) {
+            System.err.println("Error al intentar borrar el archivo de Supabase: " + e.getMessage());
+            // No lanzamos la excepción para que no rompa la aplicación si el archivo ya no existía
         }
     }
 }

@@ -466,13 +466,32 @@ async function cargarAlbum() {
                 div.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">No hay fotos</div>';
                 return;
             }
-            div.innerHTML = fotos.reverse().slice(0, 9).map(f => `
+            div.innerHTML = fotos.reverse().slice(0, 9).map(f => {
+                const deleteBtn = perfilId === miId ? 
+                    `<div style="position:absolute; top:5px; right:5px; background:rgba(255,0,0,0.8); color:white; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:10; font-size:12px;" onclick="event.stopPropagation(); borrarFoto(${f.id})"><i class="fas fa-trash"></i></div>` 
+                    : '';
+                return `
                 <div class="album-item" onclick="abrirLightbox('${BASE_URL}/uploads/${f.url}')">
+                    ${deleteBtn}
                     <img src="${BASE_URL}/uploads/${f.url}">
                     <div class="album-overlay"><i class="fas fa-expand"></i></div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
         }
     } catch (e) {}
+}
+
+async function borrarFoto(fotoId) {
+    if(!confirm("¿Seguro que quieres borrar esta foto de tu álbum?")) return;
+    try {
+        const r = await fetch(`${BASE_URL}/api/fotos/${fotoId}`, { method: 'DELETE' });
+        if (r.ok) {
+            cargarAlbum();
+            cargarTablon(); // Refrescar tablón también por si la foto salía ahí
+        } else {
+            alert("Error al borrar la foto.");
+        }
+    } catch(e) { console.error(e); }
 }
 
 async function cargarAmigos() {
