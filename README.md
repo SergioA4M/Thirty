@@ -65,7 +65,15 @@ Si deseas clonar el proyecto y ejecutarlo en tu máquina local, sigue estos paso
 
 ## 📸 Capturas de Pantalla
 
-> **Tip para Sergio:** *Toma unas cuantas capturas de pantalla de la página de Login, tu Muro principal, el Chat y tu Perfil, guárdalas en una carpeta `/assets` o `/docs` en tu repositorio y enlázalas aquí para que el proyecto luzca increíble a simple vista.*
+<div align="center">
+  <img src="docs/home.png" alt="Muro Principal" width="48%">
+  <img src="docs/perfil.png" alt="Perfil de Usuario" width="48%">
+</div>
+<br>
+<div align="center">
+  <img src="docs/mensajes.png" alt="Chat y Mensajería" width="48%">
+  <img src="docs/gente.png" alt="Buscador de Amigos" width="48%">
+</div>
 
 <div align="center">
   <br/>
