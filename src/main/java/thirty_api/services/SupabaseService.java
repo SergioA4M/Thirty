@@ -1,5 +1,6 @@
 package thirty_api.services;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -12,11 +13,11 @@ import org.springframework.web.client.HttpClientErrorException;
 @Service
 public class SupabaseService {
 
-    // Cambia esto por tu Project URL de Supabase
-    private final String SUPABASE_URL = "https://ylxpcytucebvzijqyrsx.supabase.co";
+    @Value("${supabase.url}")
+    private String SUPABASE_URL;
     
-    // La key 'anon' pública de tu proyecto Supabase (Empieza por eyJ...)
-    private final String API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlseHBjeXR1Y2VidnppanF5cnN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MDUzNTAsImV4cCI6MjA5MTM4MTM1MH0.r9XQdT60WsoVX9NT5AOvEo6PP7Y2HeKr0TN8qKTMBz8";
+    @Value("${supabase.key}")
+    private String API_KEY;
 
     /**
      * Sube un archivo (byte[]) al bucket "uploads" de Supabase.
