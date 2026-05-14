@@ -61,8 +61,18 @@ public class UserController {
         if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("El email es obligatorio");
         }
+        
+        String email = user.getEmail().trim().toLowerCase();
+        if (!email.endsWith("@gmail.com") && !email.endsWith("@gmail.es")) {
+            return ResponseEntity.badRequest().body("El correo debe pertenecer a @gmail.com o @gmail.es");
+        }
+        
         if (user.getPasswordHash() == null || user.getPasswordHash().isEmpty()) {
             return ResponseEntity.badRequest().body("La contraseña es obligatoria");
+        }
+        
+        if (user.getPasswordHash().length() < 4) {
+            return ResponseEntity.badRequest().body("La contraseña debe tener al menos 4 caracteres");
         }
         
         user.setCreatedAt(LocalDateTime.now()); // Fecha de creación del usuario
