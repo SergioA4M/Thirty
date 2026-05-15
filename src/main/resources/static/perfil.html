@@ -441,7 +441,7 @@ async function publicarEnTablon() {
         body: texto
     });
 
-    if (perfilId === miId) {
+    if (perfilId == miId) {
         const nombre = localStorage.getItem('usuarioNombre');
         const miFoto = localStorage.getItem('usuarioFoto') || '';
         await fetch(`${BASE_URL}/api/posts`, {
@@ -519,7 +519,7 @@ async function subirAlAlbum() {
             const res = await fetch(`${BASE_URL}/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
             if (res.ok) {
                 const d = await res.json();
-                if (perfilId === miId) {
+                if (perfilId == miId) {
                     await fetch(`${BASE_URL}/api/posts`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },

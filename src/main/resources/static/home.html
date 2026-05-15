@@ -558,21 +558,22 @@ async function cargarPosts() {
         muro.innerHTML = '<h3 style="color:#333;margin-bottom:15px;"><i class="fas fa-newspaper"></i> Novedades de amigos</h3>';
         
         const miNombre = localStorage.getItem('usuarioNombre');
+        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
         
-        posts.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(async p => {
-            const avatar = p.fotoAutor ? `${BASE_URL}/uploads/${p.fotoAutor}` : `https://ui-avatars.com/api/?name=${p.author}&background=3b5998&color=fff&size=64`;
+        const postsOrdenados = posts.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        for (const p of postsOrdenados) {
+            const avatar = (p.fotoAutor && p.fotoAutor !== 'null' && p.fotoAutor !== '') ? `${BASE_URL}/uploads/${p.fotoAutor}` : `https://ui-avatars.com/api/?name=${p.author}&background=3b5998&color=fff&size=64`;
             const esMio = p.author === miNombre;
             const borrar = esMio ? `<i class="fas fa-trash-alt" onclick="borrarPost(${p.id})" style="float:right;cursor:pointer;color:#ccc;"></i>` : "";
             
             let likeBtnClass = '';
-            try {
-                const likeRes = await fetch(`${BASE_URL}/api/likes/check/${localStorage.getItem('usuarioID')}/post/${p.id}`);
-                const liked = await likeRes.json();
-                likeBtnClass = liked ? 'liked' : '';
-            } catch(e) {}
-            
             let countLikes = 0;
             try {
+                const likeRes = await fetch(`${BASE_URL}/api/likes/check/${miId}/post/${p.id}`);
+                const liked = await likeRes.json();
+                likeBtnClass = liked ? 'liked' : '';
+                
                 const countRes = await fetch(`${BASE_URL}/api/likes/count/post/${p.id}`);
                 countLikes = await countRes.json();
             } catch(e) {}
@@ -601,7 +602,7 @@ async function cargarPosts() {
                     </div>
                 </div>
             </div>`;
-        });
+        }
     } catch(e) { console.log("Error posts"); }
 }
 
