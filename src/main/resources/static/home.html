@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Thirty - Inicio</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>­ƒæÑ</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👥</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * { box-sizing: border-box; }
@@ -260,7 +260,7 @@
             <div class="notif-panel-header">
                 <h3><i class="fas fa-bell"></i> Notificaciones</h3>
                 <div>
-                    <button onclick="marcarTodasLeidas()" style="background:none; border:none; color:white; cursor:pointer; font-size:12px; margin-right:10px;">Marcar todas le├¡das</button>
+                    <button onclick="marcarTodasLeidas()" style="background:none; border:none; color:white; cursor:pointer; font-size:12px; margin-right:10px;">Marcar todas leídas</button>
                     <i class="fas fa-times" onclick="cerrarNotificaciones()" style="cursor:pointer;"></i>
                 </div>
             </div>
@@ -269,12 +269,12 @@
 
         <!-- Crear Post -->
         <div class="status-box">
-            <textarea id="textoPost" placeholder="┬┐Qu├® hay de nuevo, treinta├▒ero?" rows="2"></textarea>
+            <textarea id="textoPost" placeholder="¿Qué hay de nuevo, treintañero?" rows="2"></textarea>
             <div class="status-actions">
                 <div>
-                    <button class="status-btn" onclick="toggleEmoji()" title="Emoji">­ƒÿè</button>
+                    <button class="status-btn" onclick="toggleEmoji()" title="Emoji">😊</button>
                     <button class="status-btn" onclick="document.getElementById('inputSubirTodo').click()" title="Foto/Video"><i class="fas fa-image"></i></button>
-                    <button class="status-btn" onclick="toggleStickers()" title="Stickers">­ƒÿÄ</button>
+                    <button class="status-btn" onclick="toggleStickers()" title="Stickers">😎</button>
                 </div>
                 <button class="btn-publicar" onclick="publicarMensaje()">Publicar</button>
             </div>
@@ -298,7 +298,7 @@
                 </div>
             </div>
             <div id="chat-input-area" style="display:none;">
-                <button class="chat-emoji-btn" onclick="toggleChatEmoji()">­ƒÿè</button>
+                <button class="chat-emoji-btn" onclick="toggleChatEmoji()">😊</button>
                 <button class="chat-btn" onclick="document.getElementById('chatFileInput').click()"><i class="fas fa-image"></i></button>
                 <input type="file" id="chatFileInput" class="hidden" accept="image/*" onchange="enviarFotoChat(event)">
                 <input type="text" id="mensajeTexto" class="chat-input" placeholder="Escribe un mensaje..." onkeypress="if(event.key==='Enter')enviarMensajeChat()">
@@ -350,9 +350,9 @@ let receptorIdActual = null;
 let currentStoryIndex = 0;
 let storiesData = [];
 
-const EMOJIS = ['­ƒÿÇ','­ƒÿé','­ƒÿì','­ƒÑ░','­ƒÿè','­ƒÿÄ','­ƒñö','­ƒÿà','­ƒÿ¡','­ƒñ®','­ƒÿç','­ƒÑ│','­ƒÿï','­ƒñù','­ƒÿ£','­ƒñ½','­ƒÿñ','­ƒÑ║','­ƒÖÅ','­ƒæï','ÔØñ´©Å','­ƒöÑ','Ô£¿','­ƒîƒ','­ƒÆ»','­ƒÄë','­ƒÆ¬','­ƒæÇ','­ƒÄ«','­ƒÄÁ','Ôÿò','­ƒìò','­ƒîê','­ƒÆñ','­ƒÿ┤','­ƒñÆ','­ƒÿÀ','­ƒÆè','­ƒÅâ','Ô£ê´©Å','­ƒô©','­ƒÆ╗','­ƒô▒','­ƒÄ¼','­ƒôÜ','­ƒÆ░','­ƒÄü','­ƒî©','­ƒî║','­ƒìÇ','­ƒªï','­ƒÉ▒','­ƒÉÂ'];
+const EMOJIS = ['😀','😂','😍','🥰','😊','😎','🤔','😅','😭','🤩','😇','🥳','😋','🤗','😜','🤫','😤','🥺','🙏','👋','❤️','🔥','✨','🌟','💯','🎉','💪','👀','🎮','🎵','☕','🍕','🌈','💤','😴','🤒','😷','💊','🏃','✈️','📸','💻','📱','🎬','📚','💰','🎁','🌸','🌺','🍀','🦋','🐱','🐶'];
 
-const STICKERS = ['­ƒÿÇ','­ƒÿé','­ƒÑ░','­ƒÿì','­ƒÿè','­ƒÿÄ','­ƒñ®','­ƒÑ│','­ƒÿ£','­ƒñù','­ƒÿ¡','­ƒÑ║','­ƒÿñ','­ƒÿç','­ƒñö','­ƒÿà','ÔØñ´©Å','­ƒöÑ','Ô£¿','­ƒÆ»','­ƒÄë','­ƒÆ¬','­ƒæì','­ƒæÄ','­ƒæÅ','­ƒÖî','­ƒñØ','­ƒæï','­ƒÖÅ','­ƒÆï','­ƒÄü','­ƒîƒ','Ô¡É','­ƒÆ½','Ô£à','ÔØî','ÔÜá´©Å','­ƒÆí','­ƒöö','­ƒôó','­ƒÄÁ','­ƒÄÂ','­ƒÆ¼','­ƒÆ¡','­ƒù¿´©Å','­ƒôÀ','­ƒÄÑ','­ƒô╣','­ƒÅû´©Å','­ƒî┤','­ƒîè','Ôø▒´©Å','­ƒÅö´©Å','­ƒîà','­ƒîä','­ƒì╗','­ƒÑé','­ƒìÀ','Ôÿò','­ƒìò','­ƒìö','­ƒî«','­ƒìú','­ƒÄé','­ƒì░','­ƒºü','­ƒì¬','­ƒì½','­ƒì┐','­ƒºâ','­ƒÑñ','­ƒì║','­ƒì╗','­ƒÑâ','­ƒìÀ','­ƒÑé','­ƒÑñ'];
+const STICKERS = ['😀','😂','🥰','😍','😊','😎','🤩','🥳','😜','🤗','😭','🥺','😤','😇','🤔','😅','❤️','🔥','✨','💯','🎉','💪','👍','👎','👏','🙌','🤝','👋','🙏','💋','🎁','🌟','⭐','💫','✅','❌','⚠️','💡','🔔','📢','🎵','🎶','💬','💭','🗨️','📷','🎥','📹','🏖️','🌴','🌊','⛱️','🏔️','🌅','🌄','🍻','🥂','🍷','☕','🍕','🍔','🌮','🍣','🎂','🍰','🧁','🍪','🍫','🍿','🧃','🥤','🍺','🍻','🥃','🍷','🥂','🥤'];
 
 function initEmojiGrid() {
     const grid = document.getElementById('emoji-grid');
@@ -621,7 +621,7 @@ async function enviarComentario(postId, input) {
     await fetch(`${BASE_URL}/api/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ author: miNombre, content: `­ƒÆ¼ ${input.value}`, postId: postId })
+        body: JSON.stringify({ author: miNombre, content: `💬 ${input.value}`, postId: postId })
     });
     
     input.value = '';
@@ -631,7 +631,7 @@ async function enviarComentario(postId, input) {
 
 function compartirPost(postId) {
     const postUrl = `${BASE_URL}/post.html?id=${postId}`;
-    const shareText = 'Mira esta publicaci├│n en Thirty';
+    const shareText = 'Mira esta publicación en Thirty';
     
     const modal = document.createElement('div');
     modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;';
@@ -679,7 +679,7 @@ async function toggleLike(entidadId, tipo, element, receptorId) {
 
 async function publicarMensaje() {
     const t = document.getElementById('textoPost');
-    const nombre = localStorage.getItem('usuarioNombre') || 'An├│nimo';
+    const nombre = localStorage.getItem('usuarioNombre') || 'Anónimo';
     if (!t.value.trim()) return;
     
     await fetch(`${BASE_URL}/api/posts`, {
@@ -733,7 +733,7 @@ async function cargarAmigosSidebar() {
         const amigos = await r.json();
         const cont = document.getElementById('lista-contactos');
         const onlineCount = amigos.filter(a => a.online).length;
-        document.getElementById('online-count').textContent = `${onlineCount} en l├¡nea`;
+        document.getElementById('online-count').textContent = `${onlineCount} en línea`;
         
         cont.innerHTML = amigos.map(a => {
             const foto = a.fotoPerfil ? `${BASE_URL}/uploads/${a.fotoPerfil}` : `https://ui-avatars.com/api/?name=${a.firstName}&background=3b5998&color=fff&size=64`;
@@ -948,7 +948,7 @@ async function marcarTodasLeidas() {
 }
 
 async function borrarPost(id) {
-    if (confirm('┬┐Borrar esta publicaci├│n?')) {
+    if (confirm('¿Borrar esta publicación?')) {
         await fetch(`${BASE_URL}/api/posts/${id}`, { method: 'DELETE' });
         cargarPosts();
     }

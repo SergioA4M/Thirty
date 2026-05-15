@@ -13,9 +13,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // NOTA: Como ahora usamos Supabase (en el UploadController), 
-        // ya no necesitamos mapear recursos locales de "/uploads/**".
-        // Sin embargo, por seguridad si tienes algo estetico extra, se puede dejar asi:
+        // NOTA: Como ahora uso Supabase (en el UploadController),
+        // ya no necesito mapear recursos locales de "/uploads/**".
+        // Sin embargo, por seguridad, se puede dejar asi:
         // registry.addResourceHandler("/**").addResourceLocations("classpath:/static/");
     }
 }
