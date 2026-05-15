@@ -441,13 +441,13 @@ async function publicarEnTablon() {
         body: texto
     });
 
-    if (perfilId == miId) {
+    if (Number(perfilId) === Number(miId)) {
         const nombre = localStorage.getItem('usuarioNombre');
         const miFoto = localStorage.getItem('usuarioFoto') || '';
         await fetch(`${BASE_URL}/api/posts`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ author: nombre, content: texto, autorId: miId, fotoAutor: miFoto })
+            body: JSON.stringify({ author: nombre, content: texto, autorId: Number(miId), fotoAutor: miFoto })
         });
     }
     
@@ -519,11 +519,11 @@ async function subirAlAlbum() {
             const res = await fetch(`${BASE_URL}/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
             if (res.ok) {
                 const d = await res.json();
-                if (perfilId == miId) {
+                if (Number(perfilId) === Number(miId)) {
                     await fetch(`${BASE_URL}/api/posts`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ author: nombre, content: `/uploads/${d.url}`, autorId: miId, fotoAutor: miFoto })
+                        body: JSON.stringify({ author: nombre, content: `/uploads/${d.url}`, autorId: Number(miId), fotoAutor: miFoto })
                     });
                 }
             }

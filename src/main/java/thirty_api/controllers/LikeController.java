@@ -73,25 +73,21 @@ public class LikeController {
             liked = true; // El estado final es "con like"
 
             // 4. Lógica de NOTIFICACIONES. 
-            // Si el like fue a un "post", tenemos el ID del receptor, y el que da el like NO es el mismo dueño del post (no te notificas a ti mismo)
-            if ("post".equals(tipo) && receptorId != null && !receptorId.equals(usuarioId)) {
+            if (receptorId != null && receptorId > 0 && !receptorId.equals(usuarioId)) {
                 User receptor = userRepository.findById(receptorId).orElse(null);
                 if (receptor != null) {
-                    // Contamos cuántos likes totales tiene el post ahora
-                    long totalLikes = likeRepository.countByTipoAndEntidadId("post", entidadId);
-                    
-                    // Preparamos el mensaje para la notificación (plural o singular)
+                    long totalLikes = likeRepository.countByTipoAndEntidadId(tipo, entidadId);
+                    String tipoNombre = "post".equals(tipo) ? "publicación" : ("foto".equals(tipo) ? "foto" : "comentario");
                     String contenido = totalLikes == 1 ? 
-                        usuario.getFirstName() + " le dio like a tu publicación" :
-                        usuario.getFirstName() + " y " + (totalLikes - 1) + " más le dieron like a tu publicación";
+                        usuario.getFirstName() + " le dio like a tu " + tipoNombre :
+                        usuario.getFirstName() + " y " + (totalLikes - 1) + " más le dieron like a tu " + tipoNombre;
                     
-                    // Creamos y guardamos la notificación para el dueño del post
                     Notificacion notif = new Notificacion();
-                    notif.setUsuario(receptor); // Quien recibe el aviso
-                    notif.setEmisor(usuario);   // Quien provocó el aviso
-                    notif.setTipo("like");      // Tipo de aviso (para poner un icono de corazón, por ejemplo)
-                    notif.setContenido(contenido);// El texto que calculamos arriba
-                    notif.setEntidadId(entidadId);// Para que al clicar en la notificación, lo lleve al post correcto
+                    notif.setUsuario(receptor);
+                    notif.setEmisor(usuario);
+                    notif.setTipo("like");
+                    notif.setContenido(contenido);
+                    notif.setEntidadId(entidadId);
                     notificacionRepository.save(notif);
                 }
             }
