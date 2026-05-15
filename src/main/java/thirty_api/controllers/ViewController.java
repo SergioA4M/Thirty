@@ -7,12 +7,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Controlador de Vistas (ViewController).
- *
- * ¿Qué es esto?
- * A diferencia de los @RestController (que devuelven datos puros en JSON),
+ * @RestController (que devuelven datos puros en JSON),
  * un @Controller normal en Spring Boot se utiliza habitualmente para 
  * devolver o redirigir a páginas web enteras (archivos HTML).
- * 
  * En nuestro caso, como usamos HTML puro en la carpeta "static", 
  * este controlador solo nos sirve para una cosa muy específica: 
  * redirigir a la gente a la pantalla de inicio de sesión.

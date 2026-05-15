@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Controlador de Mensajes (Chat).
- * Gestiona el env\u00edo y recepci\u00f3n de mensajes privados entre usuarios, as\u00ed como sus notificaciones.
+ * Gestiona el envio y recepcion de mensajes privados entre usuarios, asi como sus notificaciones.
  */
 @RestController
 @RequestMapping("/api/mensajes")
@@ -25,7 +25,7 @@ public class MensajeController {
     @Autowired private NotificacionRepository notificacionRepository;
 
     /**
-     * Env\u00eda un mensaje privado de un usuario a otro y genera una notificaci\u00f3n.
+     * Envio un mensaje privado de un usuario a otro y genera una notificacion.
      * Endpoint: POST /api/mensajes/enviar?emisorId=1&receptorId=2
      */
     @PostMapping("/enviar")
@@ -37,12 +37,12 @@ public class MensajeController {
         m.setContenido(texto);
         mensajeRepository.save(m);
 
-        // Generamos una notificaci\u00f3n para que el receptor sepa que tiene un mensaje nuevo
+        // Generamos una notificacion para que el receptor sepa que tiene un mensaje nuevo
         Notificacion notif = new Notificacion();
         notif.setUsuario(m.getReceptor());
         notif.setEmisor(m.getEmisor());
         notif.setTipo("mensaje");
-        notif.setContenido(m.getEmisor().getFirstName() + " te envi\u00f3 un mensaje");
+        notif.setContenido(m.getEmisor().getFirstName() + " te envio un mensaje");
         notif.setEntidadId(m.getId());
         notificacionRepository.save(notif);
 
@@ -55,12 +55,12 @@ public class MensajeController {
      */
     @GetMapping("/historial/{id1}/{id2}")
     public List<Mensaje> historial(@PathVariable Long id1, @PathVariable Long id2) {
-        // Busca la charla sin importar qui\u00e9n la empez\u00f3 (A y B)
+        // Busca la charla sin importar quienn la ha empezado (A y B)
         return mensajeRepository.buscarConversacion(id1, id2);
     }
 
     /**
-     * Marca como "le\u00eddos" todos los mensajes que ten\u00eda pendientes de una conversaci\u00f3n.
+     * Marca como "leidos" todos los mensajes que tengamos pendientes de una conversacion.
      * Esto limpia el globo verde de notificaciones de chat.
      * Endpoint: POST /api/mensajes/marcar-leidos/{emisorId}/{receptorId}
      */
@@ -69,7 +69,7 @@ public class MensajeController {
         // Obtenemos todos los mensajes de la charla
         List<Mensaje> mensajes = mensajeRepository.buscarConversacion(emisorId, receptorId);
         
-        // Filtramos los que est\u00e1n sin leer y de los que yo soy el receptor, y los marcamos como le\u00eddos (true)
+        // Filtramos los que estan sin leer y de los que yo soy el receptor, y los marcamos como leidos (true)
         mensajes.stream()
             .filter(m -> m.getReceptor().getId().equals(emisorId) && !m.isLeido())
             .forEach(m -> {

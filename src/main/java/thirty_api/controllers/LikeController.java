@@ -16,15 +16,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Optional;
 
-/**
- * Controlador de Likes (Me Gusta) - LikeController.
- *
- * ¿Qué es esto?
- * En Spring Boot, un @RestController recibe las peticiones HTTP del navegador.
- * Este controlador se encarga exclusivamente de la lógica de los "Me Gusta".
- * Permite a los usuarios dar "Like" a publicaciones (posts), fotos, comentarios, etc.,
- * quitar el like (unlike), saber cuántos likes tiene algo y notificar al autor.
- */
+
 @RestController // Indica que los métodos devuelven datos puros (generalmente en formato JSON) para que el Frontend los consuma.
 @RequestMapping("/api/likes") // Todas las rutas definidas en este controlador empezarán por "/api/likes"
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS}, allowedHeaders = "*") // Permite que la app web pueda conectarse sin problemas de CORS

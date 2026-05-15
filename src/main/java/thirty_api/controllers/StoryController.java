@@ -21,8 +21,8 @@ import java.util.Optional;
 
 /**
  * Controlador de Stories (StoryController)
- * Maneja la creaci\u00f3n, visualizaci\u00f3n, eliminaci\u00f3n y comentarios
- * de las publicaciones ef\u00edmeras estilo "Instagram Stories".
+ * Maneja la creacion, visualizacion, eliminacion y comentarios
+ * de las publicaciones efimeras estilo "Instagram Stories".
  */
 @RestController // Indica que devuelve respuestas en formato JSON
 @RequestMapping("/api/stories") // Ruta base para estos endpoints
@@ -48,11 +48,11 @@ public class StoryController {
                                         @RequestParam("file") MultipartFile file,
                                         @RequestParam(required = false) String texto) {
         try {
-            // Buscamos al usuario que est\u00e1 subiendo la story
+            // Buscamos al usuario que esta subiendo la story
             User usuario = userRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-            // Generamos un nombre \u00fanico basado en la fecha para no sobreescribir otras fotos
+            // Generamos un nombre unico basado en la fecha para no sobreescribir otras fotos
             String extension = file.getOriginalFilename()
                 .substring(file.getOriginalFilename().lastIndexOf("."));
             String nombreArchivo = "story_" + System.currentTimeMillis() + extension;
@@ -70,7 +70,7 @@ public class StoryController {
             return ResponseEntity.ok(story); // Todo OK, devolvemos la story creada
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Error: " + e.getMessage()); // Algo fall\u00f3
+            return ResponseEntity.status(500).body("Error: " + e.getMessage()); // Algo fallo
         }
     }
 
@@ -83,7 +83,7 @@ public class StoryController {
         try {
             User usuario = userRepository.findById(usuarioId).orElse(null);
             if (usuario == null) {
-                return ResponseEntity.ok(List.of()); // Si no hay usuario, lista vac\u00eda
+                return ResponseEntity.ok(List.of()); // Si no hay usuario, lista vacia
             }
 
             LocalDateTime ahora = LocalDateTime.now();
@@ -95,7 +95,7 @@ public class StoryController {
                     .map(User::getId)
                     .toList());
             }
-            // Tambi\u00e9n nos a\u00f1adimos a nosotros mismos para ver nuestras stories
+            // Tambien nos añadimos a nosotros mismos para ver nuestras stories
             amigoIds.add(usuarioId);
 
             // Buscamos en BD las stories de esa lista de IDs
@@ -108,10 +108,7 @@ public class StoryController {
         }
     }
 
-    /**
-     * Obtiene \u00faniamente las stories publicadas por un usuario espec\u00edfico
-     * Endpoint: GET /api/stories/mis-stories/{usuarioId}
-     */
+
     @GetMapping("/mis-stories/{usuarioId}")
     public ResponseEntity<List<Story>> misStories(@PathVariable Long usuarioId) {
         List<Story> stories = storyRepository.findByUsuarioIdOrderByFechaCreacionDesc(usuarioId);
@@ -130,7 +127,7 @@ public class StoryController {
     }
 
     /**
-     * Publica un comentario en una story y env\u00eda una notificaci\u00f3n al due\u00f1o de la story
+     * Publica un comentario en una story y envoa una notificacion al dueño de la story
      * Endpoint: POST /api/stories/{storyId}/comentar/{usuarioId}
      */
     @PostMapping("/{storyId}/comentar/{usuarioId}")
@@ -142,7 +139,7 @@ public class StoryController {
             Story story = storyRepository.findById(storyId)
                 .orElseThrow(() -> new RuntimeException("Story no encontrado"));
             
-            // Buscar qui\u00e9n es el autor del comentario
+            // Buscar quien es el autor del comentario
             User usuario = userRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -153,10 +150,10 @@ public class StoryController {
             comentario.setContenido(contenido);
             comentarioStoryRepository.save(comentario);
 
-            // Si le comento la story a otro (y no a m\u00ed mismo), le env\u00edo notificaci\u00f3n
+            // Si le comento la story a otro (y no a mi mismo), le envio notificacion
             if (!usuarioId.equals(story.getUsuario().getId())) {
                 Notificacion notif = new Notificacion();
-                notif.setUsuario(story.getUsuario()); // El receptor (due\u00f1o de la story)
+                notif.setUsuario(story.getUsuario()); // El receptor (dueño de la story)
                 notif.setEmisor(usuario);             // Yo (el que comenta)
                 notif.setTipo("comentario_story");
                 notif.setContenido(usuario.getFirstName() + " comentou tu story"); // Texto del aviso

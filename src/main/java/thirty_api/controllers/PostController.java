@@ -21,7 +21,7 @@ public class PostController {
     private final PostRepository postRepository;
 
     /**
-     * Constructor para que Spring inyecte autom\u00e1ticamente el repositorio al arrancar.
+     * Constructor para que Spring inyecte automaticamente el repositorio al arrancar.
      * Es una alternativa al @Autowired.
      */
     public PostController(PostRepository postRepository) {
@@ -29,7 +29,7 @@ public class PostController {
     }
 
     /**
-     * Listar todas las publicaciones del muro, ordenadas de m\u00e1s nueva a m\u00e1s vieja.
+     * Listar todas las publicaciones del muro, ordenadas de mas nueva a mas vieja.
      * Endpoint: GET /api/posts
      */
     @GetMapping
@@ -38,7 +38,7 @@ public class PostController {
     }
 
     /**
-     * Guarda una nueva publicaci\u00f3n en la base de datos.
+     * Guarda una nueva publicacion en la base de datos.
      * Endpoint: POST /api/posts
      */
     @PostMapping
@@ -60,7 +60,7 @@ public class PostController {
     }
 
     /**
-     * Busca un post concreto por su ID (Muy \u00fatil para la p\u00e1gina de ver un post individual para compartir).
+     * Busca un post concreto por su ID (Muy util para la pagina de ver un post individual para compartir).
      * Endpoint: GET /api/posts/{id}
      */
     @GetMapping("/{id}")

@@ -13,17 +13,9 @@ import java.nio.file.*;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Controlador de Fotos (FotoController).
- *
- * ¿Qué es esto?
- * En Spring Boot, un @RestController es una clase que maneja las peticiones que
- * llegan desde el navegador o la app (Frontend) a través de Internet (URLs).
- * Este controlador en particular se encarga de todo lo relacionado con el álbum
- * de fotos de los usuarios: subir nuevas fotos, ver las fotos de alguien o borrarlas.
- */
+
 @RestController // Indica que esta clase responderá con datos (normalmente JSON), no con páginas HTML directamente.
-@RequestMapping("/api/fotos") // Todas las URLs de este controlador empezarán por "/api/fotos"
+@RequestMapping("/api/fotos") // Todas las URLs de este controlador empiezan por "/api/fotos"
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.OPTIONS}, allowedHeaders = "*") // Permite que cualquier página web pueda pedirle datos a esta API (Cross-Origin Resource Sharing)
 public class FotoController {
 
@@ -34,7 +26,7 @@ public class FotoController {
     // Repositorio para acceder a los datos de los usuarios.
     @Autowired private UserRepository userRepository;
     
-    // Servicio que creamos para conectarnos con la nube (Supabase) y guardar los archivos allí.
+    // Servicio para conectarnos con la nube (Supabase) y guardar los archivos allí.
     @Autowired private thirty_api.services.SupabaseService supabaseService;
 
     /**

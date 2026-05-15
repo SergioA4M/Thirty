@@ -13,15 +13,13 @@ import java.util.List;
 
 /**
  * Controlador de Comentarios (ComentarioController).
- *
- * ¿Qué es esto?
  * En Spring Boot, un @RestController es una clase que maneja las peticiones que
  * llegan desde el navegador o la app (Frontend) a través de Internet (URLs).
  * Este controlador se encarga de todo lo relacionado con los comentarios que los usuarios
  * se dejan en sus perfiles (el famoso "Muro" de Tuenti).
  */
 @RestController // Indica que esta clase responderá con datos (normalmente JSON), no con páginas HTML directamente.
-@RequestMapping("/api/comentarios") // Todas las URLs de este controlador empezarán por "/api/comentarios"
+@RequestMapping("/api/comentarios") // Todas las URLs de este controlador empiezan por "/api/comentarios"
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.OPTIONS}, allowedHeaders = "*") // Permite que cualquier página web pueda pedirle datos a esta API (Cross-Origin Resource Sharing)
 public class ComentarioController {
 

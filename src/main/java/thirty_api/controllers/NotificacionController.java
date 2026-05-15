@@ -14,15 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-/**
- * Controlador de Notificaciones (NotificacionController).
- *
- * ¿Qué es esto?
- * En Spring Boot, un @RestController maneja las peticiones que llegan desde el Frontend.
- * Este controlador es el encargado de gestionar las "alertas" o notificaciones que 
- * recibe un usuario (ej. "A Juan le ha gustado tu foto", "María te ha comentado en el muro", 
- * mensajes nuevos, etc.). Es clave para mantener a los usuarios informados y enganchados.
- */
+
 @RestController // Indica que esta clase devuelve datos (JSON), no vistas HTML directamente.
 @RequestMapping("/api/notificaciones") // Todas las URLs de este controlador empiezan por "/api/notificaciones"
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.OPTIONS}, allowedHeaders = "*") // Permite peticiones desde el frontend web
