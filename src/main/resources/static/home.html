@@ -597,7 +597,7 @@ async function cargarPosts() {
                         <span class="post-action" onclick="compartirPost(${p.id})"><i class="fas fa-share"></i> Compartir</span>
                     </div>
                     <div class="comentario-input" id="comentario-${p.id}" style="display:none;margin-top:10px;">
-                        <input type="text" placeholder="Escribe un comentario..." style="width:100%;padding:8px;border:1px solid #ddd;border-radius:20px;box-sizing:border-box;" onkeypress="if(event.key==='Enter')enviarComentario(${p.id}, this)">
+                        <input type="text" placeholder="Escribe un comentario..." style="width:100%;padding:8px;border:1px solid #ddd;border-radius:20px;box-sizing:border-box;" onkeypress="if(event.key==='Enter')enviarComentario(${p.id}, this, ${p.autorId || 0})">
                     </div>
                 </div>
             </div>`;
@@ -613,17 +613,27 @@ function mostrarComentario(postId, element) {
     }
 }
 
-async function enviarComentario(postId, input) {
+async function enviarComentario(postId, input, receptorId) {
     if (!input.value.trim()) return;
     const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
     const miNombre = localStorage.getItem('usuarioNombre');
+    const miFoto = localStorage.getItem('usuarioFoto') || '';
     
     await fetch(`${BASE_URL}/api/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ author: miNombre, content: `💬 ${input.value}`, postId: postId })
+        body: JSON.stringify({ author: miNombre, content: `💬 ${input.value}`, postId: postId, autorId: miId, fotoAutor: miFoto })
     });
     
+    // Enviar notificación de comentario al dueño del post original
+    if (receptorId && receptorId != miId) {
+        await fetch(`${BASE_URL}/api/notificaciones/crear`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emisorId: miId, usuarioId: receptorId, tipo: 'comentario', contenido: `${miNombre} comentó en tu publicación`, entidadId: postId })
+        });
+    }
+
     input.value = '';
     document.getElementById(`comentario-${postId}`).style.display = 'none';
     cargarPosts();
@@ -680,12 +690,14 @@ async function toggleLike(entidadId, tipo, element, receptorId) {
 async function publicarMensaje() {
     const t = document.getElementById('textoPost');
     const nombre = localStorage.getItem('usuarioNombre') || 'Anónimo';
+    const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
+    const miFoto = localStorage.getItem('usuarioFoto') || '';
     if (!t.value.trim()) return;
     
     await fetch(`${BASE_URL}/api/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ author: nombre, content: t.value })
+        body: JSON.stringify({ author: nombre, content: t.value, autorId: miId, fotoAutor: miFoto })
     });
     t.value = "";
     cargarPosts();
@@ -701,10 +713,12 @@ async function subirYCompartir() {
     const r = await fetch(`${BASE_URL}/api/fotos/upload/${localStorage.getItem('usuarioID')}`, { method: 'POST', body: fd });
     if (r.ok) {
         const d = await r.json();
+        const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
+        const miFoto = localStorage.getItem('usuarioFoto') || '';
         await fetch(`${BASE_URL}/api/posts`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ author: localStorage.getItem('usuarioNombre'), content: `/uploads/${d.url}` })
+            body: JSON.stringify({ author: localStorage.getItem('usuarioNombre'), content: `/uploads/${d.url}`, autorId: miId, fotoAutor: miFoto })
         });
         cargarPosts();
     }

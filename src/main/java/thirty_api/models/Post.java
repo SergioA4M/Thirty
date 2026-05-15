@@ -35,6 +35,10 @@ public class Post {
     @Column(length = 500)
     private String content;
 
+    private Long autorId; // NEW: to link to user profile
+
+    private String fotoAutor; // NEW: to show profile picture in home feed
+
     /**
      * Fecha y hora exacta en la que se creó el post.
      * Fundamental para ordenar el Tablón de Novedades de forma cronológica (del más reciente al más antiguo).
@@ -56,6 +60,12 @@ public class Post {
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
     
+    public Long getAutorId() { return autorId; }
+    public void setAutorId(Long autorId) { this.autorId = autorId; }
+    
+    public String getFotoAutor() { return fotoAutor; }
+    public void setFotoAutor(String fotoAutor) { this.fotoAutor = fotoAutor; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

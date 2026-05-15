@@ -440,6 +440,16 @@ async function publicarEnTablon() {
         headers: { 'Content-Type': 'text/plain' },
         body: texto
     });
+
+    if (perfilId === miId) {
+        const nombre = localStorage.getItem('usuarioNombre');
+        const miFoto = localStorage.getItem('usuarioFoto') || '';
+        await fetch(`${BASE_URL}/api/posts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ author: nombre, content: texto, autorId: miId, fotoAutor: miFoto })
+        });
+    }
     
     document.getElementById('nuevoTablon').value = "";
     cargarTablon();
@@ -498,12 +508,25 @@ async function subirAlAlbum() {
     const fileInput = document.getElementById('albumInput');
     if (!fileInput.files[0]) return;
     
+    const nombre = localStorage.getItem('usuarioNombre');
+    const miFoto = localStorage.getItem('usuarioFoto') || '';
+
     for (let file of fileInput.files) {
         const formData = new FormData();
         formData.append("file", file);
         
         try {
-            await fetch(`${BASE_URL}/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
+            const res = await fetch(`${BASE_URL}/api/fotos/upload/${miId}`, { method: 'POST', body: formData });
+            if (res.ok) {
+                const d = await res.json();
+                if (perfilId === miId) {
+                    await fetch(`${BASE_URL}/api/posts`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ author: nombre, content: `/uploads/${d.url}`, autorId: miId, fotoAutor: miFoto })
+                    });
+                }
+            }
         } catch (e) { console.log("Error subiendo foto"); }
     }
     
@@ -537,10 +560,11 @@ async function subirYCompartir() {
     if (r.ok) {
         const d = await r.json();
         const nombre = localStorage.getItem('usuarioNombre');
+        const miFoto = localStorage.getItem('usuarioFoto') || '';
         await fetch(`${BASE_URL}/api/posts`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ author: nombre, content: `/uploads/${d.url}` })
+            body: JSON.stringify({ author: nombre, content: `/uploads/${d.url}`, autorId: miId, fotoAutor: miFoto })
         });
     }
 }
