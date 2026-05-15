@@ -560,7 +560,11 @@ async function cargarPosts() {
         const miNombre = localStorage.getItem('usuarioNombre');
         const miId = localStorage.getItem('usuarioID') || localStorage.getItem('usuarioId');
         
-        const postsOrdenados = posts.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // Separamos los posts normales de los comentarios (que tienen parentPostId)
+        const mainPosts = posts.filter(p => !p.parentPostId);
+        const postComments = posts.filter(p => p.parentPostId);
+        
+        const postsOrdenados = mainPosts.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
         
         for (const p of postsOrdenados) {
             const avatar = (p.fotoAutor && p.fotoAutor !== 'null' && p.fotoAutor !== '') ? `${BASE_URL}/uploads/${p.fotoAutor}` : `https://ui-avatars.com/api/?name=${p.author}&background=3b5998&color=fff&size=64`;
@@ -581,6 +585,24 @@ async function cargarPosts() {
             const postUrl = `${BASE_URL}/post.html?id=${p.id}`;
             const shareText = encodeURIComponent(p.content ? p.content.substring(0, 100) : 'Mira esto en Thirty');
             
+            // Renderizamos los comentarios asociados a este post
+            const comentariosDelPost = postComments.filter(c => c.parentPostId === p.id).sort((a,b) => new Date(a.createdAt) - new Date(b.createdAt));
+            let comentariosHtml = '';
+            for (const c of comentariosDelPost) {
+                const cAvatar = (c.fotoAutor && c.fotoAutor !== 'null' && c.fotoAutor !== '') ? `${BASE_URL}/uploads/${c.fotoAutor}` : `https://ui-avatars.com/api/?name=${c.author}&background=3b5998&color=fff&size=32`;
+                const cEsMio = c.author === miNombre;
+                const cBorrar = cEsMio ? `<i class="fas fa-times" onclick="borrarPost(${c.id})" style="float:right;cursor:pointer;color:#ccc;font-size:12px;"></i>` : "";
+                comentariosHtml += `
+                    <div style="display:flex; gap:10px; margin-top:10px; padding-top:10px; border-top:1px solid #eee;">
+                        <img src="${cAvatar}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;">
+                        <div style="flex:1; background:#f0f2f5; padding:8px 12px; border-radius:15px; font-size:13px;">
+                            ${cBorrar}
+                            <a href="perfil.html?id=${c.autorId || ''}" style="text-decoration:none;color:#3b5998;font-weight:bold;">${c.author}</a>
+                            <div style="margin-top:2px;">${parsearContenido(c.content.replace('💬 ', ''))}</div>
+                        </div>
+                    </div>`;
+            }
+            
             muro.innerHTML += `<div class="post">
                 <img src="${avatar}" class="avatar">
                 <div class="post-content">
@@ -597,6 +619,7 @@ async function cargarPosts() {
                         <span class="post-action" onclick="mostrarComentario(${p.id}, this)"><i class="fas fa-comment"></i> Comentar</span>
                         <span class="post-action" onclick="compartirPost(${p.id})"><i class="fas fa-share"></i> Compartir</span>
                     </div>
+                    <div id="comentarios-lista-${p.id}">${comentariosHtml}</div>
                     <div class="comentario-input" id="comentario-${p.id}" style="display:none;margin-top:10px;">
                         <input type="text" placeholder="Escribe un comentario..." style="width:100%;padding:8px;border:1px solid #ddd;border-radius:20px;box-sizing:border-box;" onkeypress="if(event.key==='Enter')enviarComentario(${p.id}, this, ${p.autorId || 0})">
                     </div>
@@ -623,7 +646,7 @@ async function enviarComentario(postId, input, receptorId) {
     await fetch(`${BASE_URL}/api/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ author: miNombre, content: `💬 ${input.value}`, postId: postId, autorId: miId, fotoAutor: miFoto })
+        body: JSON.stringify({ author: miNombre, content: `💬 ${input.value}`, parentPostId: postId, autorId: miId, fotoAutor: miFoto })
     });
     
     // Enviar notificación de comentario al dueño del post original

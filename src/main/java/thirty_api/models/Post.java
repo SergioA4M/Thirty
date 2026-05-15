@@ -39,6 +39,8 @@ public class Post {
 
     private String fotoAutor; // NEW: to show profile picture in home feed
 
+    private Long parentPostId; // NEW: If this post is a comment on another post, this stores the parent post's ID
+
     /**
      * Fecha y hora exacta en la que se creó el post.
      * Fundamental para ordenar el Tablón de Novedades de forma cronológica (del más reciente al más antiguo).
@@ -65,6 +67,9 @@ public class Post {
     
     public String getFotoAutor() { return fotoAutor; }
     public void setFotoAutor(String fotoAutor) { this.fotoAutor = fotoAutor; }
+
+    public Long getParentPostId() { return parentPostId; }
+    public void setParentPostId(Long parentPostId) { this.parentPostId = parentPostId; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
